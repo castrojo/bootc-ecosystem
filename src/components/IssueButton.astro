@@ -1,9 +1,11 @@
 ---
-// No props needed — links are hardcoded to this repo
+import { REPO_ISSUES_NEW_URL } from '../lib/site-config';
+// Links are sourced from src/lib/site-config.ts (single source of truth for
+// repo identity — see MIGRATION.md when moving to projectbluefin/metrics).
 ---
 <div class="issue-bar">
   <a
-    href="https://github.com/castrojo/bootc-ecosystem/issues/new"
+    href={REPO_ISSUES_NEW_URL}
     class="issue-link"
     target="_blank"
     rel="noopener noreferrer"
