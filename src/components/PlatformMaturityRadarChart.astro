@@ -1,0 +1,136 @@
+---
+import ChartCard from './ChartCard.astro';
+import { safeJson } from '../lib/inject.ts';
+
+interface Dimension {
+  key: string;
+  label: string;
+  level: number;
+  evidence: string;
+  gap: string;
+  last_assessed: string;
+}
+
+interface Props {
+  dimensions: Dimension[];
+  levels: Record<string, string>;
+}
+
+const { dimensions, levels } = Astro.props;
+---
+
+<ChartCard
+  title="Maturity by Dimension"
+  canvasId="platform-maturity-radar-chart"
+  height={340}
+/>
+<script
+  type="application/json"
+  id="platform-maturity-radar-data"
+  set:html={safeJson({ dimensions, levels })}
+></script>
+
+<script>
+  import '../lib/chart-registry.js';
+  import { Chart } from 'chart.js';
+  import { getChartColors } from '../lib/chart-theme.js';
+  import { readChartData } from '../lib/inject.js';
+
+  interface RadarDimension {
+    key: string;
+    label: string;
+    level: number;
+  }
+
+  const { dimensions, levels } = readChartData<{
+    dimensions: RadarDimension[];
+    levels: Record<string, string>;
+  }>('platform-maturity-radar-data');
+
+  const canvas = document.getElementById('platform-maturity-radar-chart') as HTMLCanvasElement | null;
+
+  let chart: Chart | undefined;
+  if (canvas) {
+    const colors = getChartColors();
+    const purple = getComputedStyle(document.documentElement).getPropertyValue('--purple').trim() || '#af68d9';
+
+    try {
+      chart = new Chart(canvas, {
+        type: 'radar',
+        data: {
+          labels: dimensions.map((d) => d.label),
+          datasets: [
+            {
+              label: 'Current level',
+              data: dimensions.map((d) => d.level),
+              backgroundColor: purple + '33',
+              borderColor: purple,
+              borderWidth: 2,
+              fill: true,
+              pointBackgroundColor: purple,
+              pointRadius: 4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const level = ctx.raw as number;
+                  const name = levels[String(level)] ?? '';
+                  return ` Level ${level} — ${name}`;
+                },
+              },
+            },
+          },
+          scales: {
+            r: {
+              beginAtZero: true,
+              min: 0,
+              max: 5,
+              ticks: {
+                stepSize: 1,
+                color: colors.muted,
+                font: { size: 10 },
+                backdropColor: 'transparent',
+              },
+              grid: { color: colors.grid },
+              angleLines: { color: colors.grid },
+              pointLabels: { color: colors.text, font: { size: 12 } },
+            },
+          },
+        },
+      });
+    } catch (e) {
+      console.error('[PlatformMaturityRadarChart] Chart.js init failed:', e);
+    }
+
+    window.addEventListener('themechange', () => {
+      if (!chart) return;
+      const c = getChartColors();
+      const p = getComputedStyle(document.documentElement).getPropertyValue('--purple').trim() || '#af68d9';
+      const ds = chart.data.datasets[0] as { backgroundColor: string; borderColor: string; pointBackgroundColor: string };
+      ds.backgroundColor = p + '33';
+      ds.borderColor = p;
+      ds.pointBackgroundColor = p;
+      const scales = chart.options.scales as Record<string, {
+        ticks?: { color: string };
+        grid?: { color: string };
+        angleLines?: { color: string };
+        pointLabels?: { color: string };
+      }>;
+      const r = scales?.r;
+      if (r) {
+        if (r.ticks) r.ticks.color = c.muted;
+        if (r.grid) r.grid.color = c.grid;
+        if (r.angleLines) r.angleLines.color = c.grid;
+        if (r.pointLabels) r.pointLabels.color = c.text;
+      }
+      chart.update();
+    });
+  }
+</script>
