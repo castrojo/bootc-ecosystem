@@ -321,6 +321,14 @@ test.describe('New image tab smoke coverage', () => {
       url: '/bootc-ecosystem/secureblue/',
       heading: 'secureblue',
       isBuildPage: false,
+      canvasId: 'secureblue-trend',
+    },
+    {
+      name: 'wayblue',
+      url: '/bootc-ecosystem/wayblue/',
+      heading: 'wayblue',
+      isBuildPage: false,
+      canvasId: 'wayblue-trend',
     },
   ]) {
     test(`${pageConfig.name} page returns 200 and key content is visible`, async ({ page }) => {
@@ -334,7 +342,7 @@ test.describe('New image tab smoke coverage', () => {
         const hasDashboard = html.includes('kpi-strip') || html.includes('kpi-card') || html.includes('dora-panel') || html.includes('Pipeline Status');
         expect(hasCollecting || hasDashboard, `${pageConfig.name} page must show collecting state or dashboard`).toBe(true);
       } else {
-        await expect(page.locator('canvas#secureblue-trend')).toBeAttached();
+        await expect(page.locator(`canvas#${pageConfig.canvasId}`)).toBeAttached();
       }
     });
   }

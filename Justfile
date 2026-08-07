@@ -84,7 +84,7 @@ verify-live:
     BASE="https://castrojo.github.io/bootc-ecosystem"
     echo "=== Verifying live site: $BASE ==="
 
-    for path in "/" "/testhub/" "/overall/" "/contributors/" "/builds/" "/aurora-builds/" "/bazzite-builds/" "/universal-blue/" "/ucore/" "/zirconium/" "/bootcrew/" "/secureblue/"; do
+    for path in "/" "/testhub/" "/overall/" "/contributors/" "/builds/" "/aurora-builds/" "/bazzite-builds/" "/universal-blue/" "/ucore/" "/zirconium/" "/bootcrew/" "/secureblue/" "/wayblue/"; do
       code=$(curl -sf -o /dev/null -w "%{http_code}" "$BASE$path" || echo "000")
       if [ "$code" = "200" ]; then
         echo "✅ $BASE$path → HTTP $code"
