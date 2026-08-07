@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -839,15 +840,50 @@ type releasesOutput struct {
 	MonthlyBreakdown map[string]map[string]int `json:"monthly_breakdown"`
 }
 
+// releaseRepoSpec identifies a tracked repo for release-frequency stats.
+type releaseRepoSpec struct{ owner, repo, label string }
+
+// releaseFetchFunc fetches the raw (tag_name, published_at) JSON for one repo.
+// Extracted as a function type so buildReleasesOutput's per-repo fault-isolation
+// logic can be unit tested without invoking the real `gh` CLI.
+type releaseFetchFunc func(owner, repo string) ([]byte, error)
+
+// fetchReleasesRaw is the production releaseFetchFunc — calls the GitHub REST API
+// via the gh CLI.
+func fetchReleasesRaw(owner, repo string) ([]byte, error) {
+	return ghcli.Run("api",
+		fmt.Sprintf("repos/%s/%s/releases?per_page=100", owner, repo),
+		"--paginate",
+		"--jq", "[.[] | {tag_name,published_at}]")
+}
+
 func runFetchReleases() error {
-	repos := []struct{ owner, repo, label string }{
+	repos := []releaseRepoSpec{
 		{"ublue-os", "bluefin", "Bluefin"},
 		{"ublue-os", "aurora", "Aurora"},
 		{"ublue-os", "bazzite", "Bazzite"},
 		{"ublue-os", "ucore", "uCore"},
 	}
 
-	now := time.Now().UTC()
+	out, err := buildReleasesOutput(repos, time.Now().UTC(), fetchReleasesRaw)
+
+	if writeErr := writeJSON("src/data/releases.json", out); writeErr != nil {
+		return writeErr
+	}
+	fmt.Fprintf(os.Stderr, "✓ Wrote src/data/releases.json (%d/%d repos succeeded)\n", len(out.Repos), len(repos))
+	return err
+}
+
+// buildReleasesOutput fetches and aggregates release-frequency stats for each repo
+// in repos, using fetch to retrieve the raw release JSON per repo.
+//
+// Per-repo fault isolation: a single repo's fetch failure (rate limit, transient
+// 5xx, etc.) must not prevent the other repos from producing data. Errors are
+// collected and processing continues to the next repo; all collected errors are
+// joined and returned once every repo has been attempted, so the caller still
+// gets partial data (out.Repos only contains successfully-fetched repos) plus
+// full per-repo diagnostics via errors.Join.
+func buildReleasesOutput(repos []releaseRepoSpec, now time.Time, fetch releaseFetchFunc) (releasesOutput, error) {
 	cutoff365 := now.AddDate(0, 0, -365)
 	cutoff90 := now.AddDate(0, 0, -90)
 	cutoff30 := now.AddDate(0, 0, -30)
@@ -858,16 +894,17 @@ func runFetchReleases() error {
 		MonthlyBreakdown: map[string]map[string]int{},
 	}
 
+	var errs []error
+
 	for _, r := range repos {
 		fullName := fmt.Sprintf("%s/%s", r.owner, r.repo)
 		fmt.Fprintf(os.Stderr, "→ Fetching releases for %s…\n", fullName)
 
-		raw, err := ghcli.Run("api",
-			fmt.Sprintf("repos/%s/%s/releases?per_page=100", r.owner, r.repo),
-			"--paginate",
-			"--jq", "[.[] | {tag_name,published_at}]")
+		raw, err := fetch(r.owner, r.repo)
 		if err != nil {
-			return fmt.Errorf("fetch releases %s: %w", fullName, err)
+			fmt.Fprintf(os.Stderr, "⚠️  fetch releases %s: %v\n", fullName, err)
+			errs = append(errs, fmt.Errorf("fetch releases %s: %w", fullName, err))
+			continue
 		}
 
 		var records []releaseRecord
@@ -945,11 +982,10 @@ func runFetchReleases() error {
 		})
 	}
 
-	if err := writeJSON("src/data/releases.json", out); err != nil {
-		return err
+	if len(errs) > 0 {
+		return out, errors.Join(errs...)
 	}
-	fmt.Fprintln(os.Stderr, "✓ Wrote src/data/releases.json")
-	return nil
+	return out, nil
 }
 
 // ── fetch-contributors ──────────────────────────────────────────────────────
