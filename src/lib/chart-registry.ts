@@ -4,8 +4,8 @@
  * Registers only the chart types and components actually used by this site,
  * instead of the kitchen-sink chart.js/auto import.
  *
- * Used chart types: Line, Bar, Doughnut
- * Used scales: Category (x-axis labels), Linear (y-axis numbers)
+ * Used chart types: Line, Bar, Doughnut, Radar
+ * Used scales: Category (x-axis labels), Linear (y-axis numbers), RadialLinear (radar)
  * Used elements: Point, Line, Bar, Arc
  * Used plugins: Tooltip, Legend
  *
@@ -19,10 +19,12 @@ import {
   LineElement,
   PointElement,
   LinearScale,
+  RadialLinearScale,
   CategoryScale,
   BarController,
   BarElement,
   DoughnutController,
+  RadarController,
   ArcElement,
   Tooltip,
   Legend,
@@ -34,10 +36,12 @@ Chart.register(
   LineElement,
   PointElement,
   LinearScale,
+  RadialLinearScale,
   CategoryScale,
   BarController,
   BarElement,
   DoughnutController,
+  RadarController,
   ArcElement,
   Tooltip,
   Legend,
