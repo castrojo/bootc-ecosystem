@@ -140,7 +140,7 @@ func TestFetchCSVLast30Days_MockServer(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	recs, _, _, err := fetchCSVFromURL(srv.URL, "")
+	recs, _, _, _, err := fetchCSVFromURL(srv.URL, "")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -264,7 +264,7 @@ func TestParseOsVersionDist_WithCsvOsVersionColumn(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	_, dist, _, err := fetchCSVFromURL(srv.URL, "")
+	_, dist, _, _, err := fetchCSVFromURL(srv.URL, "")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -357,5 +357,90 @@ func TestRowsToWeekRecords_SysAgeMinusOneExcluded(t *testing.T) {
 	}
 	if recs[0].Distros["aurora"] != 400 {
 		t.Errorf("expected aurora=400 (sys_age=-1 excluded), got %d", recs[0].Distros["aurora"])
+	}
+}
+
+// --- isHandheldVariant tests ---
+
+func TestIsHandheldVariant_Handheld(t *testing.T) {
+	cases := []string{
+		"bazzite-deck", "bazzite-deck-gnome", "bazzite-deck-nvidia",
+		"bazzite-ally", "bazzite-ally-gnome",
+		"BAZZITE-DECK", // case-insensitive
+	}
+	for _, variant := range cases {
+		if !isHandheldVariant(variant) {
+			t.Errorf("isHandheldVariant(%q): expected true", variant)
+		}
+	}
+}
+
+func TestIsHandheldVariant_Desktop(t *testing.T) {
+	cases := []string{
+		"bazzite", "bazzite-gnome", "bazzite-nvidia", "bazzite-nvidia-open",
+		"bazzite-asus", "bazzite-asus-nvidia", "bazzite-surface", "bazzite-dx",
+		"generic", "",
+	}
+	for _, variant := range cases {
+		if isHandheldVariant(variant) {
+			t.Errorf("isHandheldVariant(%q): expected false", variant)
+		}
+	}
+}
+
+// --- parseFormFactorDist tests ---
+
+func TestParseFormFactorDist(t *testing.T) {
+	rows := []csvRow{
+		{osName: "Bazzite", osVariant: "bazzite-deck", sysAge: "0", repoTag: "fedora-42", hits: 100},
+		{osName: "Bazzite", osVariant: "bazzite-deck-gnome", sysAge: "0", repoTag: "fedora-42", hits: 50},
+		{osName: "Bazzite", osVariant: "bazzite-gnome", sysAge: "0", repoTag: "fedora-42", hits: 200},
+		{osName: "Bazzite", osVariant: "bazzite", sysAge: "0", repoTag: "fedora-42", hits: 300},
+		// Not tracked for form-factor (only Bazzite ships handheld variants).
+		{osName: "Bluefin", osVariant: "bluefin-dx", sysAge: "0", repoTag: "fedora-42", hits: 400},
+		// Excluded: sys_age=-1.
+		{osName: "Bazzite", osVariant: "bazzite-deck", sysAge: "-1", repoTag: "fedora-42", hits: 999},
+		// Excluded: non-canonical repo_tag.
+		{osName: "Bazzite", osVariant: "bazzite-deck", sysAge: "0", repoTag: "updates-released-f42", hits: 999},
+	}
+
+	got := parseFormFactorDist(rows)
+
+	if got["Bazzite"]["handheld"] != 150 {
+		t.Errorf("Bazzite handheld: expected 150, got %d", got["Bazzite"]["handheld"])
+	}
+	if got["Bazzite"]["desktop"] != 500 {
+		t.Errorf("Bazzite desktop: expected 500, got %d", got["Bazzite"]["desktop"])
+	}
+	if _, ok := got["Bluefin"]; ok {
+		t.Error("Bluefin should not appear in form-factor dist (not in formFactorDistDistros)")
+	}
+}
+
+func TestMergeFormFactorDist(t *testing.T) {
+	existing := map[string]map[string]int{
+		"Bazzite": {"desktop": 500, "handheld": 100},
+	}
+	newData := map[string]map[string]int{
+		"Bazzite": {"desktop": 600, "handheld": 150},
+	}
+
+	result := MergeFormFactorDist(existing, newData)
+
+	if result["Bazzite"]["desktop"] != 600 {
+		t.Errorf("Bazzite desktop: expected 600 (new data wins), got %d", result["Bazzite"]["desktop"])
+	}
+	if result["Bazzite"]["handheld"] != 150 {
+		t.Errorf("Bazzite handheld: expected 150 (new data wins), got %d", result["Bazzite"]["handheld"])
+	}
+}
+
+func TestMergeFormFactorDist_NilExisting(t *testing.T) {
+	newData := map[string]map[string]int{
+		"Bazzite": {"desktop": 500, "handheld": 100},
+	}
+	result := MergeFormFactorDist(nil, newData)
+	if result["Bazzite"]["desktop"] != 500 {
+		t.Errorf("Bazzite desktop: expected 500, got %d", result["Bazzite"]["desktop"])
 	}
 }

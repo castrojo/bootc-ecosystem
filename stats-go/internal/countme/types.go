@@ -21,6 +21,13 @@ type HistoryStore struct {
 	// OsVersionDist maps os_name → os_version → total active user count
 	// accumulated from CSV data over all fetches.
 	OsVersionDist map[string]map[string]int `json:"os_version_dist,omitempty"`
+	// DesktopDist maps os_name → form factor ("desktop"/"handheld") → active
+	// device count. This is a usage breakdown — not a competition metric —
+	// showing what fraction of an image's active devices run as a
+	// traditional desktop/laptop vs. a handheld (Steam Deck, ROG Ally).
+	// Only images that ship dedicated handheld variants are tracked (see
+	// formFactorDistDistros in fetcher.go).
+	DesktopDist map[string]map[string]int `json:"desktop_dist,omitempty"`
 	// CSVLastModified is the Last-Modified header value from the last successful
 	// Fedora countme CSV fetch. Persisted across CI runs so we can send
 	// If-Modified-Since on subsequent requests and skip the 546 MB download

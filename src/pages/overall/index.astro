@@ -5,6 +5,7 @@ import CountmeTrendChart from '../../components/CountmeTrendChart.astro';
 import DistroTrendChart from '../../components/DistroTrendChart.astro';
 import EcosystemPieChart from '../../components/EcosystemPieChart.astro';
 import OsVersionChart from '../../components/OsVersionChart.astro';
+import FormFactorChart from '../../components/FormFactorChart.astro';
 import QuayTrendChart from '../../components/QuayTrendChart.astro';
 import data from '../../data/countme.json';
 import DORAComparisonSection from '../../components/DORAComparisonSection.astro';
@@ -315,6 +316,7 @@ const countmeTrendImages = [
     <h2>Ecosystem Share</h2>
     <EcosystemPieChart currentWeek={data.current_week as any} distros={countmeDistros} />
     <OsVersionChart osVersionDist={osVersionDist} />
+    <FormFactorChart desktopDist={(data as any).desktop_dist ?? {}} />
 
   </section>
 </Layout>

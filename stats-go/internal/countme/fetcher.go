@@ -76,6 +76,7 @@ type csvRow struct {
 	weekEnd   string
 	osName    string
 	osVersion string
+	osVariant string
 	sysAge    string
 	repoTag   string
 	hits      int
@@ -119,6 +120,80 @@ func parseOsVersionDist(rows []csvRow) map[string]map[string]int {
 			result[row.osName] = make(map[string]int)
 		}
 		result[row.osName][row.osVersion] += row.hits
+	}
+	return result
+}
+
+// formFactorDistDistros lists the os_name values eligible for desktop_dist
+// (desktop vs. handheld form-factor) tracking. Currently only Bazzite ships
+// dedicated handheld variants ("-deck", "-ally") — Bluefin and Aurora are
+// desktop/workstation-only images, so tracking them here would just show a
+// meaningless 100% desktop split. Add distros here if they ever ship a
+// handheld-targeted variant.
+var formFactorDistDistros = map[string]bool{
+	"Bazzite": true,
+}
+
+// handheldVariantRe matches os_variant values that identify a handheld/console
+// form factor rather than a traditional desktop/laptop install. Bazzite's
+// Steam Deck build uses "-deck" (e.g. "bazzite-deck-nvidia") and its
+// ROG Ally build uses "-ally" (e.g. "bazzite-ally-gnome").
+var handheldVariantRe = regexp.MustCompile(`(?i)-?(deck|ally)(-|$)`)
+
+// isHandheldVariant returns true if the os_variant string identifies a
+// handheld/console image build (Steam Deck, ROG Ally) rather than a
+// conventional desktop/laptop install.
+func isHandheldVariant(variant string) bool {
+	return handheldVariantRe.MatchString(strings.ToLower(variant))
+}
+
+// parseFormFactorDist extracts os_name → form-factor ("desktop"/"handheld") → count
+// from CSV rows. This is a usage breakdown (not a competition metric) showing
+// what fraction of active devices for a given image run as a traditional
+// desktop/laptop vs. a handheld (Steam Deck, ROG Ally). Uses the same
+// canonical-repo-tag + sys_age filters as rowsToWeekRecords so the totals line
+// up with the "active devices" figures shown elsewhere in the UI.
+func parseFormFactorDist(rows []csvRow) map[string]map[string]int {
+	result := make(map[string]map[string]int)
+	for _, row := range rows {
+		if row.sysAge == "-1" {
+			continue
+		}
+		if !isCanonicalRepoTag(row.repoTag) {
+			continue
+		}
+		if !formFactorDistDistros[row.osName] {
+			continue
+		}
+		formFactor := "desktop"
+		if isHandheldVariant(row.osVariant) {
+			formFactor = "handheld"
+		}
+		if result[row.osName] == nil {
+			result[row.osName] = make(map[string]int)
+		}
+		result[row.osName][formFactor] += row.hits
+	}
+	return result
+}
+
+// MergeFormFactorDist replaces per-distro form-factor data with new data (not
+// additive) — the same current-snapshot semantics as MergeOsVersionDist.
+func MergeFormFactorDist(existing, newData map[string]map[string]int) map[string]map[string]int {
+	result := make(map[string]map[string]int, len(existing))
+	for distro, factors := range existing {
+		cp := make(map[string]int, len(factors))
+		for factor, cnt := range factors {
+			cp[factor] = cnt
+		}
+		result[distro] = cp
+	}
+	for distro, factors := range newData {
+		cp := make(map[string]int, len(factors))
+		for factor, cnt := range factors {
+			cp[factor] = cnt
+		}
+		result[distro] = cp
 	}
 	return result
 }
@@ -185,8 +260,9 @@ func parseCSVRows(body []byte) ([]csvRow, error) {
 		}
 	}
 
-	// os_version is optional; track whether it exists.
+	// os_version and os_variant are optional; track whether they exist.
 	osVersionIdx, hasOsVersion := colIdx["os_version"]
+	osVariantIdx, hasOsVariant := colIdx["os_variant"]
 
 	var rows []csvRow
 	for {
@@ -203,6 +279,11 @@ func parseCSVRows(body []byte) ([]csvRow, error) {
 			osVersion = strings.TrimSpace(row[osVersionIdx])
 		}
 
+		osVariant := ""
+		if hasOsVariant && osVariantIdx < len(row) {
+			osVariant = strings.TrimSpace(row[osVariantIdx])
+		}
+
 		hitsStr := strings.TrimSpace(row[colIdx["hits"]])
 		hits, err := strconv.Atoi(hitsStr)
 		if err != nil {
@@ -213,6 +294,7 @@ func parseCSVRows(body []byte) ([]csvRow, error) {
 			weekStart: strings.TrimSpace(row[colIdx["week_start"]]),
 			weekEnd:   strings.TrimSpace(row[colIdx["week_end"]]),
 			osName:    row[colIdx["os_name"]],
+			osVariant: osVariant,
 			osVersion: osVersion,
 			sysAge:    strings.TrimSpace(row[colIdx["sys_age"]]),
 			repoTag:   strings.TrimSpace(row[colIdx["repo_tag"]]),
@@ -281,20 +363,21 @@ func parseDistroName(osName string) (string, bool) {
 // lastModified should be the Last-Modified value from the previous successful
 // fetch (stored in HistoryStore.CSVLastModified). When non-empty it is sent as
 // an If-Modified-Since header; if the server returns 304 Not Modified the
-// function returns (nil, nil, "", nil) — the caller must use its cached data.
+// function returns (nil, nil, nil, "", nil) — the caller must use its cached data.
 //
 // On a successful 200 response the function returns week records, an os_version
-// distribution map, the new Last-Modified header value (to persist), and nil error.
+// distribution map, a desktop/handheld form-factor distribution map, the new
+// Last-Modified header value (to persist), and nil error.
 //
 // NOTE: The Fedora CSV is ~546 MB. We intentionally fetch the full file to
 // guarantee the header row is present (the previous Range approach broke
 // parsing because the header is on line 1, not in the last 10 MB).
 // The If-Modified-Since round-trip saves bandwidth on days where the file
 // hasn't changed (the CSV updates once per week, on Sundays).
-func fetchCSVFromURL(url, lastModified string) ([]WeekRecord, map[string]map[string]int, string, error) {
+func fetchCSVFromURL(url, lastModified string) ([]WeekRecord, map[string]map[string]int, map[string]map[string]int, string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, nil, "", fmt.Errorf("create request: %w", err)
+		return nil, nil, nil, "", fmt.Errorf("create request: %w", err)
 	}
 	if lastModified != "" {
 		req.Header.Set("If-Modified-Since", lastModified)
@@ -302,42 +385,43 @@ func fetchCSVFromURL(url, lastModified string) ([]WeekRecord, map[string]map[str
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, nil, "", fmt.Errorf("GET countme CSV: %w", err)
+		return nil, nil, nil, "", fmt.Errorf("GET countme CSV: %w", err)
 	}
 	defer resp.Body.Close()
 
 	// 304 Not Modified — caller uses its cached data unchanged.
 	if resp.StatusCode == http.StatusNotModified {
-		return nil, nil, lastModified, nil
+		return nil, nil, nil, lastModified, nil
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, nil, "", fmt.Errorf("unexpected HTTP status %d", resp.StatusCode)
+		return nil, nil, nil, "", fmt.Errorf("unexpected HTTP status %d", resp.StatusCode)
 	}
 
 	newLastModified := resp.Header.Get("Last-Modified")
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, nil, "", fmt.Errorf("read CSV body: %w", err)
+		return nil, nil, nil, "", fmt.Errorf("read CSV body: %w", err)
 	}
 
 	rows, err := parseCSVRows(body)
 	if err != nil {
-		return nil, nil, "", err
+		return nil, nil, nil, "", err
 	}
 
 	weekRecords := rowsToWeekRecords(rows)
 	osVersionDist := parseOsVersionDist(rows)
-	return weekRecords, osVersionDist, newLastModified, nil
+	formFactorDist := parseFormFactorDist(rows)
+	return weekRecords, osVersionDist, formFactorDist, newLastModified, nil
 }
 
 // FetchCSVLast30Days fetches and parses the countme CSV using the default URL.
 // lastModified is the cached Last-Modified value from a previous fetch; pass ""
-// on first run. Returns week records, os_version distribution, the new
-// Last-Modified value to persist, and any error.
-// When the server returns 304 Not Modified, week records and distribution are nil.
-func FetchCSVLast30Days(lastModified string) ([]WeekRecord, map[string]map[string]int, string, error) {
+// on first run. Returns week records, os_version distribution, desktop/handheld
+// form-factor distribution, the new Last-Modified value to persist, and any error.
+// When the server returns 304 Not Modified, week records and distributions are nil.
+func FetchCSVLast30Days(lastModified string) ([]WeekRecord, map[string]map[string]int, map[string]map[string]int, string, error) {
 	return fetchCSVFromURL(countmeCSVURL, lastModified)
 }
 
