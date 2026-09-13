@@ -74,14 +74,17 @@ const avgPassRate7d = passRateSamples.length > 0
   : null;
 ---
 
-<div id="freshness-banner" class="freshness-banner" style="display:none">
+<div id="freshness-banner" class="freshness-banner" data-generated-at={generatedAt} style="display:none">
   ⚠️ Dashboard data may be stale — last updated more than 48 hours ago.
 </div>
-<script define:vars={{ generatedAt }}>
-  const elapsed = Date.now() - new Date(generatedAt).getTime();
-  if (elapsed > 48 * 60 * 60 * 1000) {
-    const banner = document.getElementById('freshness-banner');
-    if (banner) banner.style.display = 'block';
+<script>
+  const banner = document.getElementById('freshness-banner');
+  if (banner) {
+    const generatedAt = banner.dataset.generatedAt;
+    const elapsed = generatedAt ? Date.now() - new Date(generatedAt).getTime() : 0;
+    if (elapsed > 48 * 60 * 60 * 1000) {
+      banner.style.display = 'block';
+    }
   }
 </script>
 
