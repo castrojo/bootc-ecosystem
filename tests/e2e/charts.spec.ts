@@ -243,6 +243,43 @@ test.describe('Overall tab', () => {
     await expect(callout).toBeVisible();
     await expect(callout).toContainText('countme');
   });
+
+  // Regression coverage for issue #78: "Add best practice measurements on the
+  // first tab" — the Future Proofed panel surfaces per-image checks for
+  // Cosign signing, SBOM generation, zstd:chunked, chunka, and SLSA
+  // provenance on the bootc (first) tab.
+  test('Future Proofed panel is visible with expected best-practice columns', async ({ page }) => {
+    const panel = page.locator('.future-proofed-panel');
+    await expect(panel).toBeVisible();
+
+    const heading = page.getByRole('heading', { name: 'Future Proofed' });
+    await expect(heading).toBeVisible();
+
+    const headers = panel.locator('table.fp-table thead th');
+    await expect(headers).toHaveText([
+      'Image',
+      'Cosign Signing',
+      'SBOM',
+      'zstd:chunked',
+      'chunked (chunka)',
+      'SLSA',
+    ]);
+  });
+
+  test('Future Proofed panel renders a row for every tracked image', async ({ page }) => {
+    const rows = page.locator('.future-proofed-panel table.fp-table tbody tr');
+    const rowCount = await rows.count();
+    expect(rowCount, 'Future Proofed panel must list at least one image').toBeGreaterThan(0);
+
+    // Every row must show an image label and a status cell for each check
+    // (icon + label, or a "—" placeholder when not yet tracked).
+    for (let i = 0; i < rowCount; i++) {
+      const row = rows.nth(i);
+      await expect(row.locator('.cell-image')).not.toBeEmpty();
+      const checkCells = row.locator('.cell-check');
+      expect(await checkCells.count(), 'each row must render 5 check columns').toBe(5);
+    }
+  });
 });
 
 // ─── No-empty-state contract ──────────────────────────────────────────────────
