@@ -151,3 +151,7 @@ var taps = []struct{ owner, repo string }{
 
 The pipeline automatically discovers `Casks/` and `Formula/` directories in the repo.
 Freshness checking requires a detectable GitHub URL in the `.rb` file.
+
+## License
+
+Licensed under the [Apache License, Version 2.0](LICENSE).
