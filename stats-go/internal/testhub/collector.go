@@ -216,6 +216,31 @@ func MergePackages(existing, fallback []Package) []Package {
 	return out
 }
 
+// MergeSnapshots merges two sets of DaySnapshots by date. This prevents historical
+// build status from being lost when the incremental cache only covers a narrow
+// recent window (e.g. after a cache-key bump, or when upstream CI only rebuilds a
+// subset of apps on a given day): dates present in both win from primary (the live
+// cache), while dates known only to fallback (the committed seed history) are kept
+// so that computeLastStatus/computeArchStatus can still resolve a real last-known
+// status for apps that haven't rebuilt recently, instead of falling back to
+// "pending" for apps that do have known build history.
+// Result is sorted oldest-first by date (existing snapshot ordering convention).
+func MergeSnapshots(primary, fallback []DaySnapshot) []DaySnapshot {
+	byDate := make(map[string]DaySnapshot, len(primary)+len(fallback))
+	for _, s := range fallback {
+		byDate[s.Date] = s
+	}
+	for _, s := range primary {
+		byDate[s.Date] = s
+	}
+	out := make([]DaySnapshot, 0, len(byDate))
+	for _, s := range byDate {
+		out = append(out, s)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Date < out[j].Date })
+	return out
+}
+
 // ghRunRecord is the minimal shape from gh run list --json.
 type ghRunRecord struct {
 	DatabaseID int64  `json:"databaseId"`

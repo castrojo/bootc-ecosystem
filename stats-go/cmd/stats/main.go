@@ -564,25 +564,44 @@ func hasBuildCounts(snapshots []testhub.DaySnapshot) bool {
 }
 
 func loadTesthubHistoryFrom(cacheFile, seedFile string) (*testhub.HistoryStore, error) {
-	data, err := os.ReadFile(cacheFile)
-	if err == nil {
+	var cacheStore *testhub.HistoryStore
+	if data, err := os.ReadFile(cacheFile); err == nil {
 		var store testhub.HistoryStore
 		if jsonErr := json.Unmarshal(data, &store); jsonErr == nil && hasBuildCounts(store.Snapshots) {
-			// Cache is valid and has snapshots with build data — use it.
-			return &store, nil
+			cacheStore = &store
+		} else {
+			// Cache exists but is empty, malformed, or all snapshots lack build data.
+			fmt.Fprintf(os.Stderr, "  cache file empty or missing build data, trying seed file\n")
 		}
-		// Cache exists but is empty, malformed, or all snapshots lack build data — fall through to seed.
-		fmt.Fprintf(os.Stderr, "  cache file empty or missing build data, trying seed file\n")
 	}
-	// Try seed file (covers: file-not-found, read error, empty/malformed cache).
+
+	var seedStore *testhub.HistoryStore
 	if seed, seedErr := os.ReadFile(seedFile); seedErr == nil {
 		var store testhub.HistoryStore
 		if json.Unmarshal(seed, &store) == nil && len(store.Snapshots) > 0 {
-			fmt.Fprintf(os.Stderr, "  loaded %d snapshots from seed file\n", len(store.Snapshots))
-			return &store, nil
+			seedStore = &store
 		}
 	}
-	return &testhub.HistoryStore{}, nil
+
+	switch {
+	case cacheStore != nil && seedStore != nil:
+		// Merge rather than choosing one exclusively — the live cache may only cover
+		// a narrow recent window (e.g. right after a cache-key bump, or days where
+		// upstream CI only rebuilt a subset of apps), which otherwise discards the
+		// deeper per-app history in the committed seed and causes apps with real
+		// build history to render as "pending" instead of their last-known status.
+		merged := testhub.MergeSnapshots(cacheStore.Snapshots, seedStore.Snapshots)
+		fmt.Fprintf(os.Stderr, "  merged %d cache snapshot(s) with %d seed snapshot(s) → %d total\n",
+			len(cacheStore.Snapshots), len(seedStore.Snapshots), len(merged))
+		return &testhub.HistoryStore{Snapshots: merged}, nil
+	case cacheStore != nil:
+		return cacheStore, nil
+	case seedStore != nil:
+		fmt.Fprintf(os.Stderr, "  loaded %d snapshots from seed file\n", len(seedStore.Snapshots))
+		return seedStore, nil
+	default:
+		return &testhub.HistoryStore{}, nil
+	}
 }
 
 func loadTesthubHistory() (*testhub.HistoryStore, error) {

@@ -348,6 +348,53 @@ func TestListPackagesStripsPrefix(t *testing.T) {
 	}
 }
 
+func TestMergeSnapshots_PrimaryWinsOnSameDate(t *testing.T) {
+	primary := []DaySnapshot{
+		{Date: "2026-05-09", BuildCounts: []AppDayCount{{App: "saturn", Passed: 1, Total: 1}}, LastRunID: 999},
+	}
+	fallback := []DaySnapshot{
+		{Date: "2026-05-09", BuildCounts: []AppDayCount{{App: "saturn", Failed: 1, Total: 1}}, LastRunID: 111},
+	}
+
+	got := MergeSnapshots(primary, fallback)
+	if len(got) != 1 {
+		t.Fatalf("expected 1 merged snapshot, got %d", len(got))
+	}
+	if got[0].LastRunID != 999 {
+		t.Fatalf("expected primary snapshot to win for shared date, got LastRunID=%d", got[0].LastRunID)
+	}
+}
+
+func TestMergeSnapshots_KeepsDatesUniqueToFallback(t *testing.T) {
+	primary := []DaySnapshot{
+		{Date: "2026-05-09", BuildCounts: []AppDayCount{{App: "saturn", Passed: 1, Total: 1}}},
+	}
+	fallback := []DaySnapshot{
+		{Date: "2026-04-04", BuildCounts: []AppDayCount{{App: "monkey-bubble", Passed: 1, Total: 1}}},
+		{Date: "2026-03-19", BuildCounts: []AppDayCount{{App: "monkey-bubble", Passed: 1, Total: 1}}},
+	}
+
+	got := MergeSnapshots(primary, fallback)
+	if len(got) != 3 {
+		t.Fatalf("expected 3 merged snapshots (union of dates), got %d", len(got))
+	}
+	// Result must be sorted oldest-first by date.
+	for i := 1; i < len(got); i++ {
+		if got[i-1].Date >= got[i].Date {
+			t.Fatalf("expected snapshots sorted oldest-first, got %v", got)
+		}
+	}
+	if got[len(got)-1].Date != "2026-05-09" {
+		t.Fatalf("expected most recent date last, got %s", got[len(got)-1].Date)
+	}
+}
+
+func TestMergeSnapshots_EmptyInputs(t *testing.T) {
+	if got := MergeSnapshots(nil, nil); len(got) != 0 {
+		t.Fatalf("expected empty result for empty inputs, got %d", len(got))
+	}
+}
+
 func TestMergePackages_BackfillsMissingNames(t *testing.T) {
 	existing := []Package{
 		{Name: "ghostty", VersionCount: 7, Version: "1.2.3"},
