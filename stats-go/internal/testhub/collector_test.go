@@ -1,6 +1,7 @@
 package testhub
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 )
@@ -366,5 +367,59 @@ func TestMergePackages_BackfillsMissingNames(t *testing.T) {
 	}
 	if got[0].VersionCount != 7 || got[0].Version != "1.2.3" {
 		t.Fatalf("expected existing ghostty metadata to win, got %+v", got[0])
+	}
+}
+
+// --- rawPkg.pullCount tests (see #13: GitHub Packages API does not yet expose
+// pull/download counts for container packages; these fields are forward-compatible
+// stand-ins so ListPackages picks the value up automatically whenever GitHub adds it) ---
+
+func TestRawPkgPullCount_AbsentToday(t *testing.T) {
+	var p rawPkg
+	if err := json.Unmarshal([]byte(`{"name":"testhub/ghostty","html_url":"https://example.invalid"}`), &p); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got := p.pullCount(); got != 0 {
+		t.Errorf("expected pullCount()=0 when no candidate field is present, got %d", got)
+	}
+}
+
+func TestRawPkgPullCount_DownloadCount(t *testing.T) {
+	var p rawPkg
+	if err := json.Unmarshal([]byte(`{"name":"testhub/ghostty","download_count":123}`), &p); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got := p.pullCount(); got != 123 {
+		t.Errorf("expected pullCount()=123 from download_count, got %d", got)
+	}
+}
+
+func TestRawPkgPullCount_DownloadsCount(t *testing.T) {
+	var p rawPkg
+	if err := json.Unmarshal([]byte(`{"name":"testhub/ghostty","downloads_count":456}`), &p); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got := p.pullCount(); got != 456 {
+		t.Errorf("expected pullCount()=456 from downloads_count, got %d", got)
+	}
+}
+
+func TestRawPkgPullCount_PullCount(t *testing.T) {
+	var p rawPkg
+	if err := json.Unmarshal([]byte(`{"name":"testhub/ghostty","pull_count":789}`), &p); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got := p.pullCount(); got != 789 {
+		t.Errorf("expected pullCount()=789 from pull_count, got %d", got)
+	}
+}
+
+func TestRawPkgPullCount_PrefersDownloadCountOverOthers(t *testing.T) {
+	var p rawPkg
+	if err := json.Unmarshal([]byte(`{"download_count":1,"downloads_count":2,"pull_count":3}`), &p); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if got := p.pullCount(); got != 1 {
+		t.Errorf("expected pullCount()=1 (download_count precedence), got %d", got)
 	}
 }
