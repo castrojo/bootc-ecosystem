@@ -315,6 +315,9 @@ var UniversalBlueRepos = []RepoConfig{
 			"build-akmods-main.yml",
 			"build-akmods-coreos-stable.yml",
 			"build-akmods-coreos-testing.yml",
+			"build-akmods-centos.yml",
+			"build-akmods-ogc.yml",
+			"build-akmods-longterm-6.18.yml",
 		},
 	},
 }
