@@ -29,6 +29,19 @@ Use these decisions as defaults for future agents unless superseded by a newer i
 - Issue closure in this repo:
   - Follow `~/src/skills/github-issues/SKILL.md` closure protocol before closing any issue.
   - Do not use "implemented in working tree" as closure evidence.
+- Homebrew analytics API limitations (confirmed, re-verified 2026-08-08, issue #61):
+  - `formulae.brew.sh` exposes only three analytics categories: `install`, `install-on-request`,
+    `build-error` — there is no `os-version` category and no per-formula or per-tap OS-version
+    breakdown endpoint anywhere in the public API.
+  - The only per-tap grouped analytics endpoint (`/api/analytics/${CATEGORY}/homebrew-core/${DAYS}.json`)
+    covers `homebrew-core` only; third-party taps such as `ublue-os/homebrew-tap` and
+    `ublue-os/homebrew-experimental-tap` are not indexed on `formulae.brew.sh` at all
+    (`/api/formula/{name}.json` for any ublue-os package returns 404).
+  - Do not reattempt "per-tap OS distribution" work against this API without first discovering a
+    genuinely new data source — `stats-go/internal/osanalytics` already uses the only available
+    endpoint (the global `/api/analytics/os-version/{period}.json`), which is why
+    `OsSection.astro`'s chart is titled "Linux OS Distribution (all of Homebrew)" and not
+    ublue-os-specific.
 
 Tracking issues for this plan:
 - Epic: `https://github.com/castrojo/bootc-ecosystem/issues/30`
