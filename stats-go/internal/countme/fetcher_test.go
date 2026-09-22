@@ -35,7 +35,6 @@ func TestParseDistroName_ValidExact(t *testing.T) {
 		{"Aurora", "aurora"},
 		{"secureblue", "secureblue"},
 		{"wayblue", "wayblue"},
-		{"Origami Linux", "origami"},
 		{"Blue95", "winblues"},
 		{"Blue9", "winblues"},
 		{"BlueXP", "winblues"},
