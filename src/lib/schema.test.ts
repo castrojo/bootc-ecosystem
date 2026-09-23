@@ -606,3 +606,97 @@ describe('builds-bluefin.json schema', () => {
     expect(typeof t.other).toBe('number');
   });
 });
+
+// ── platform-maturity.json ───────────────────────────────────────────────────
+// Hand-maintained CNCF Platform Engineering Maturity Model self-assessment.
+// The schema is documented in the "_comment" field at the top of the data file.
+
+describe("src/data/platform-maturity.json schema", () => {
+  const raw = loadJSON("src/data/platform-maturity.json") as Record<string, unknown>;
+
+  const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+  const EXPECTED_DIMENSION_KEYS = [
+    "provisioning",
+    "configuration",
+    "observability",
+    "onboarding",
+    "workflows",
+    "security",
+    "cost",
+  ] as const;
+
+  interface Dimension {
+    key: string;
+    label: string;
+    level: number;
+    evidence: string;
+    gap: string;
+    last_assessed: string;
+  }
+
+  it("documents its schema in a _comment field", () => {
+    expect(raw).toHaveProperty("_comment");
+  });
+
+  it("has required top-level fields", () => {
+    expect(raw).toHaveProperty("model");
+    expect(raw).toHaveProperty("model_url");
+    expect(raw).toHaveProperty("assessed_at");
+    expect(raw).toHaveProperty("levels");
+    expect(raw).toHaveProperty("dimensions");
+    expect(typeof raw.model).toBe("string");
+    expect(typeof raw.model_url).toBe("string");
+    expect(raw.assessed_at).toMatch(ISO_DATE);
+  });
+
+  it("dimensions cover all seven CNCF maturity model dimensions", () => {
+    const dims = raw.dimensions as Dimension[];
+    expect(Array.isArray(dims)).toBe(true);
+    const keys = dims.map((d) => d.key);
+    for (const expected of EXPECTED_DIMENSION_KEYS) {
+      expect(keys, `dimensions must include "${expected}"`).toContain(expected);
+    }
+    expect(keys.length).toBe(EXPECTED_DIMENSION_KEYS.length);
+  });
+
+  it("each dimension has required fields with correct types", () => {
+    const dims = raw.dimensions as Dimension[];
+    for (const d of dims) {
+      expect(typeof d.key).toBe("string");
+      expect(d.key, `dimension key "${d.key}" must be lowercase`).toBe(d.key.toLowerCase());
+      expect(typeof d.label).toBe("string");
+      expect(Number.isInteger(d.level)).toBe(true);
+      expect(d.level, `level for "${d.key}" must be 1-5`).toBeGreaterThanOrEqual(1);
+      expect(d.level, `level for "${d.key}" must be 1-5`).toBeLessThanOrEqual(5);
+      expect(typeof d.evidence).toBe("string");
+      expect(d.evidence.length, `evidence for "${d.key}" must be non-empty`).toBeGreaterThan(0);
+      expect(typeof d.gap).toBe("string");
+      expect(d.last_assessed).toMatch(ISO_DATE);
+    }
+  });
+
+  it("dimension levels have a matching name in levels", () => {
+    const dims = raw.dimensions as Dimension[];
+    const levels = raw.levels as Record<string, string>;
+    for (const d of dims) {
+      expect(levels, `levels must name level ${d.level} used by "${d.key}"`).toHaveProperty(String(d.level));
+    }
+  });
+
+  it("history entries have date, note, and scores for known dimensions", () => {
+    if (!raw.history) return; // optional
+    const history = raw.history as Array<{ date: string; note: string; scores: Record<string, number> }>;
+    expect(Array.isArray(history)).toBe(true);
+    const dimKeys = new Set((raw.dimensions as Dimension[]).map((d) => d.key));
+    for (const entry of history) {
+      expect(entry.date).toMatch(ISO_DATE);
+      expect(typeof entry.note).toBe("string");
+      for (const [key, score] of Object.entries(entry.scores)) {
+        expect(dimKeys.has(key), `history score key "${key}" must be a known dimension`).toBe(true);
+        expect(Number.isInteger(score)).toBe(true);
+        expect(score).toBeGreaterThanOrEqual(1);
+        expect(score).toBeLessThanOrEqual(5);
+      }
+    }
+  });
+});

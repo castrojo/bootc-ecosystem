@@ -1,0 +1,194 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PlatformMaturityRadarChart from '../../components/PlatformMaturityRadarChart.astro';
+import PlatformMaturityTable from '../../components/PlatformMaturityTable.astro';
+import assessment from '../../data/platform-maturity.json';
+
+interface Dimension {
+  key: string;
+  label: string;
+  level: number;
+  evidence: string;
+  gap: string;
+  last_assessed: string;
+}
+
+const levels = (assessment as { levels: Record<string, string> }).levels;
+const dimensions = (assessment as { dimensions: Dimension[] }).dimensions;
+const assessedAt = (assessment as { assessed_at: string }).assessed_at;
+const model = (assessment as { model: string }).model;
+const modelUrl = (assessment as { model_url: string }).model_url;
+const history = (assessment as { history?: { date: string; note: string; scores: Record<string, number> }[] }).history ?? [];
+
+const average = dimensions.length > 0
+  ? (dimensions.reduce((sum, d) => sum + d.level, 0) / dimensions.length).toFixed(1)
+  : '—';
+const strongest = dimensions.reduce<Dimension | null>(
+  (best, d) => (best === null || d.level > best.level ? d : best),
+  null,
+);
+const weakest = dimensions.reduce<Dimension | null>(
+  (worst, d) => (worst === null || d.level < worst.level ? d : worst),
+  null,
+);
+---
+
+<Layout title="Platform Maturity" activeTab="platform-maturity">
+  <header class="page-header">
+    <div>
+      <h1>Platform Maturity</h1>
+      <div class="meta">
+        Self-assessment against the
+        <a href={modelUrl} target="_blank" rel="noopener">{model}</a> ·
+        Last assessed {assessedAt}
+      </div>
+    </div>
+  </header>
+
+  <section class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-value">{average}</div>
+      <div class="kpi-label">Average Level (1–5)</div>
+    </div>
+    {strongest && (
+      <div class="kpi-card">
+        <div class="kpi-value">{strongest.label}</div>
+        <div class="kpi-label">Strongest — Level {strongest.level}</div>
+      </div>
+    )}
+    {weakest && (
+      <div class="kpi-card">
+        <div class="kpi-value">{weakest.label}</div>
+        <div class="kpi-label">Focus Area — Level {weakest.level}</div>
+      </div>
+    )}
+  </section>
+
+  <section class="explainer">
+    <p>
+      The CNCF Platform Engineering Maturity Model is a qualitative self-assessment, not a
+      machine-readable metric — scores cannot be derived from API data. Each dimension below is
+      scored by hand on a 1–5 scale (1&nbsp;Provisional, 2&nbsp;Operational, 3&nbsp;Scale,
+      4&nbsp;Optimize) and stored in
+      <a href="https://github.com/castrojo/bootc-ecosystem/blob/main/src/data/platform-maturity.json" target="_blank" rel="noopener"><code>src/data/platform-maturity.json</code></a>,
+      so the project can re-assess itself over time and track progress.
+    </p>
+  </section>
+
+  <PlatformMaturityRadarChart dimensions={dimensions} levels={levels} />
+
+  <PlatformMaturityTable dimensions={dimensions} levels={levels} />
+
+  {history.length > 0 && (
+    <section class="history-section">
+      <h2>Assessment History</h2>
+      <ul class="history-list">
+        {history.map((entry) => (
+          <li class="history-item">
+            <span class="history-date">{entry.date}</span>
+            <span class="history-note">{entry.note}</span>
+            <span class="history-scores">
+              {Object.entries(entry.scores).map(([key, score]) => `${key}: ${score}`).join(' · ')}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <section class="resources">
+    <h3>References</h3>
+    <ul>
+      <li><a href="https://tag-app-delivery.cncf.io/whitepapers/platform-eng-maturity-model/" target="_blank" rel="noopener">CNCF Platform Engineering Maturity Model</a></li>
+      <li><a href="https://maturitymodel.cncf.io/" target="_blank" rel="noopener">Cloud Native Maturity Model</a></li>
+    </ul>
+  </section>
+</Layout>
+
+<style>
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+  .meta { font-size: 0.8rem; color: var(--muted); }
+  .meta a { color: var(--link); text-decoration: none; }
+  .meta a:hover { text-decoration: underline; }
+  code { font-size: 0.85em; background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 0.1em 0.35em; }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .kpi-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .kpi-value { font-size: 1.6rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+  .kpi-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .explainer {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 1.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .explainer p { margin: 0; }
+  .explainer a { color: var(--link); }
+
+  .history-section { margin-top: 2rem; }
+  .history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .history-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .history-date { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .history-note { color: var(--muted); }
+  .history-scores { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  .resources {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .resources h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+  .resources ul {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+  .resources a {
+    color: var(--link);
+    text-decoration: none;
+  }
+  .resources a:hover {
+    text-decoration: underline;
+  }
+</style>

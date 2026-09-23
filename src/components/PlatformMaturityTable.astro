@@ -1,0 +1,112 @@
+---
+interface Dimension {
+  key: string;
+  label: string;
+  level: number;
+  evidence: string;
+  gap: string;
+  last_assessed: string;
+}
+
+interface Props {
+  dimensions: Dimension[];
+  levels: Record<string, string>;
+}
+
+const { dimensions, levels } = Astro.props;
+---
+
+<div class="maturity-table-wrap">
+  <table class="maturity-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Level</th>
+        <th>Evidence</th>
+        <th>Gap to Next Level</th>
+        <th>Last Assessed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {dimensions.map((d) => (
+        <tr>
+          <td class="dim-label">{d.label}</td>
+          <td class="dim-level">
+            <span class={`level-badge level-${d.level}`}>
+              {d.level} — {levels[String(d.level)] ?? 'Unknown'}
+            </span>
+          </td>
+          <td class="dim-text">{d.evidence}</td>
+          <td class="dim-text">{d.gap}</td>
+          <td class="dim-date">{d.last_assessed}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .maturity-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+  .maturity-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .maturity-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .maturity-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .maturity-table tr:last-child td {
+    border-bottom: none;
+  }
+  .dim-label {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .dim-level {
+    white-space: nowrap;
+  }
+  .level-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .level-badge.level-1 { color: var(--red); border-color: var(--red); }
+  .level-badge.level-2 { color: var(--yellow); border-color: var(--yellow); }
+  .level-badge.level-3 { color: var(--green); border-color: var(--green); }
+  .level-badge.level-4 { color: var(--purple); border-color: var(--purple); }
+  .level-badge.level-5 { color: var(--indigo); border-color: var(--indigo); }
+  .dim-text {
+    color: var(--muted);
+    line-height: 1.5;
+    min-width: 220px;
+  }
+  .dim-date {
+    color: var(--muted);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

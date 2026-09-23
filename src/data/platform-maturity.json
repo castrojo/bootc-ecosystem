@@ -1,0 +1,111 @@
+{
+  "_comment": [
+    "Schema for the CNCF Platform Engineering Maturity Model self-assessment.",
+    "This file is maintained BY HAND (qualitative self-assessment, not API-derived).",
+    "Edit it when the project re-assesses itself against the model.",
+    "Reference: https://tag-app-delivery.cncf.io/whitepapers/platform-eng-maturity-model/",
+    "",
+    "Top-level fields:",
+    "  model         (string)  Name of the model this assessment follows.",
+    "  model_url     (string)  Canonical URL of the model.",
+    "  assessed_at   (string)  Date of the current assessment, ISO 8601 YYYY-MM-DD.",
+    "  levels        (object)  Ordered level names keyed by '1'..'5'. The CNCF model",
+    "                          names are: 1 Provisional, 2 Operational, 3 Scale, 4 Optimize.",
+    "                          Key '5' is reserved for a future/aspirational level and is",
+    "                          rendered as part of the 1-5 scale on the radar chart only.",
+    "  dimensions    (array)   One object per maturity dimension (order is preserved on the page):",
+    "    key         (string)  Stable machine name, lowercase (e.g. 'provisioning').",
+    "    label       (string)  Display name (e.g. 'Provisioning').",
+    "    level       (integer) Current self-assessed level, 1-5 inclusive.",
+    "    evidence    (string)  What exists today that justifies this level.",
+    "    gap         (string)  What is missing to reach the next level.",
+    "    last_assessed (string) Date this dimension was last (re)scored, YYYY-MM-DD.",
+    "  history       (array)   Append-only log of past assessments, oldest first:",
+    "    date        (string)  Assessment date, YYYY-MM-DD.",
+    "    note        (string)  What changed or why the assessment happened.",
+    "    scores      (object)  Snapshot of dimension key -> level at that date."
+  ],
+  "model": "CNCF Platform Engineering Maturity Model",
+  "model_url": "https://tag-app-delivery.cncf.io/whitepapers/platform-eng-maturity-model/",
+  "assessed_at": "2026-08-07",
+  "levels": {
+    "1": "Provisional",
+    "2": "Operational",
+    "3": "Scale",
+    "4": "Optimize",
+    "5": "Aspirational (beyond model)"
+  },
+  "dimensions": [
+    {
+      "key": "provisioning",
+      "label": "Provisioning",
+      "level": 4,
+      "evidence": "Images are built and published declaratively via GitHub Actions and bootc; base images, tags, and update streams are fully automated and reproducible.",
+      "gap": "Self-service provisioning of custom image variants by contributors is still manual (fork-and-edit rather than a service catalog).",
+      "last_assessed": "2026-08-07"
+    },
+    {
+      "key": "configuration",
+      "label": "Configuration",
+      "level": 3,
+      "evidence": "system_files, dconf overrides, and image configuration are version-controlled and applied uniformly across variants; shared configuration lives in bluefin-common.",
+      "gap": "Configuration drift detection between variants and post-deployment compliance reporting are not yet systematic.",
+      "last_assessed": "2026-08-07"
+    },
+    {
+      "key": "observability",
+      "label": "Observability",
+      "level": 3,
+      "evidence": "This dashboard aggregates build health, DORA metrics, supply-chain signals, and adoption (countme) data across the ecosystem with daily refresh and smoke tests.",
+      "gap": "No end-user runtime telemetry or alerting on image update failures in the field; signals are build-time and aggregate only.",
+      "last_assessed": "2026-08-07"
+    },
+    {
+      "key": "onboarding",
+      "label": "Onboarding",
+      "level": 2,
+      "evidence": "Documented installation media, website docs, and a working 'ujust' first-boot experience get new users to a running system.",
+      "gap": "Contributor onboarding remains tribal knowledge; no paved-path templates or guided contribution workflows for new image variants.",
+      "last_assessed": "2026-08-07"
+    },
+    {
+      "key": "workflows",
+      "label": "Workflows",
+      "level": 3,
+      "evidence": "CI/CD pipelines cover build, test, sign, and publish for every image; shared reusable workflows and Renovate keep toil low across repos.",
+      "gap": "Promotion between streams (testing -> stable) still requires manual judgement; progressive delivery is not automated.",
+      "last_assessed": "2026-08-07"
+    },
+    {
+      "key": "security",
+      "label": "Security",
+      "level": 3,
+      "evidence": "All images are signed with cosign, SBOMs are generated at build time, base images are rebuilt daily, and OpenSSF Scorecard is tracked on this dashboard.",
+      "gap": "Vulnerability triage SLAs and runtime security policy enforcement are informal and maintainer-driven.",
+      "last_assessed": "2026-08-07"
+    },
+    {
+      "key": "cost",
+      "label": "Cost",
+      "level": 2,
+      "evidence": "CI minutes, registry storage, and CDN usage are within free/donated tiers; build frequency is tuned to balance freshness against runner time.",
+      "gap": "No per-image or per-variant cost attribution; capacity decisions are made ad hoc rather than against measured unit cost.",
+      "last_assessed": "2026-08-07"
+    }
+  ],
+  "history": [
+    {
+      "date": "2026-08-07",
+      "note": "Initial self-assessment recorded when this page was introduced.",
+      "scores": {
+        "provisioning": 4,
+        "configuration": 3,
+        "observability": 3,
+        "onboarding": 2,
+        "workflows": 3,
+        "security": 3,
+        "cost": 2
+      }
+    }
+  ]
+}
