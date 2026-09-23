@@ -61,11 +61,33 @@ func stripTesthubPrefix(name string) string {
 }
 
 // rawPkg is the minimal JSON shape from the packages list API.
+//
+// download_count/downloads_count/pull_count are not currently returned by the
+// GitHub Packages REST API for container packages (see
+// https://github.com/castrojo/bootc-ecosystem/issues/13), so these fields are
+// normally absent and PullCount stays 0. They're declared here as pointers so
+// that if/when GitHub adds pull/download counts to the response, ListPackages
+// picks them up automatically without needing another code change.
 type rawPkg struct {
-	Name      string `json:"name"`
-	HTMLURL   string `json:"html_url"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	Name           string `json:"name"`
+	HTMLURL        string `json:"html_url"`
+	CreatedAt      string `json:"created_at"`
+	UpdatedAt      string `json:"updated_at"`
+	DownloadCount  *int64 `json:"download_count"`
+	DownloadsCount *int64 `json:"downloads_count"`
+	PullCount      *int64 `json:"pull_count"`
+}
+
+// pullCount returns the first non-nil pull/download count field reported by
+// the API, under whichever key name GitHub ends up using. Returns 0 if none
+// of the candidate fields are present yet.
+func (p rawPkg) pullCount() int64 {
+	for _, c := range []*int64{p.DownloadCount, p.DownloadsCount, p.PullCount} {
+		if c != nil {
+			return *c
+		}
+	}
+	return 0
 }
 
 // rawVersion is the minimal JSON shape from the package versions API.
@@ -112,8 +134,9 @@ func ListPackages(org string) ([]Package, error) {
 		name := stripTesthubPrefix(fullName)
 
 		p := Package{
-			Name:    name,
-			HTMLURL: pkg.HTMLURL,
+			Name:      name,
+			HTMLURL:   pkg.HTMLURL,
+			PullCount: pkg.pullCount(),
 		}
 		if pkg.CreatedAt != "" {
 			if t, err := time.Parse(time.RFC3339, pkg.CreatedAt); err == nil {
