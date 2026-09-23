@@ -77,6 +77,15 @@ OS_VERSION_DIST = {
     "Aurora":     {"40": 900,    "41": 1_550,  "42": 150},
 }
 
+# Desktop vs. handheld usage breakdown (NOT market share/competition — a usage
+# split for images that ship dedicated handheld variants). Only Bazzite ships
+# handheld builds (Steam Deck "-deck", ROG Ally "-ally"); Bluefin/Aurora/etc.
+# are desktop/laptop-only so they're omitted here.
+DESKTOP_DIST = {
+    "Bazzite": {"desktop": 54_000, "handheld": 17_000},
+}
+
+
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -284,6 +293,7 @@ def build_countme_json(history: dict) -> dict:
         "wow_growth_pct": wow,
         "history": history,
         "os_version_dist": OS_VERSION_DIST,
+        "desktop_dist": DESKTOP_DIST,
     }
 
 
@@ -310,6 +320,7 @@ def main():
     }
     countme_cache = countme_history
     countme_cache["os_version_dist"] = OS_VERSION_DIST
+    countme_cache["desktop_dist"] = DESKTOP_DIST
 
     write_json("src/data/testhub.json", testhub_out)
     write_json("src/data/countme.json", countme_out)

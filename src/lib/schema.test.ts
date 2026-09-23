@@ -145,6 +145,34 @@ describe("src/data/countme.json schema", () => {
     }
   });
 
+  it("desktop_dist keys are title case when present — matches os_version_dist convention", () => {
+    if (!raw.desktop_dist) return; // optional field
+    const dist = raw.desktop_dist as Record<string, unknown>;
+    const keys = Object.keys(dist);
+    if (keys.length === 0) return;
+
+    for (const key of keys) {
+      expect(
+        DISTRO_KEYS_TITLECASE as readonly string[],
+        `desktop_dist key "${key}" must be title-case (Bazzite/Bluefin/Aurora)`
+      ).toContain(key);
+    }
+  });
+
+  it("desktop_dist form-factor keys are 'desktop'/'handheld' with non-negative counts", () => {
+    if (!raw.desktop_dist) return;
+    const dist = raw.desktop_dist as Record<string, Record<string, number>>;
+    for (const [distro, factors] of Object.entries(dist)) {
+      for (const [factor, count] of Object.entries(factors)) {
+        expect(
+          ["desktop", "handheld"],
+          `${distro} form-factor key "${factor}" must be "desktop" or "handheld"`
+        ).toContain(factor);
+        expect(count).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
   it("wow_growth_pct uses lowercase badge keys when present", () => {
     if (!raw.wow_growth_pct) return;
     const wow = raw.wow_growth_pct as Record<string, number>;

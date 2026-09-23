@@ -611,6 +611,7 @@ type countmeOutput struct {
 	WoWGrowthPct  map[string]float64        `json:"wow_growth_pct,omitempty"`
 	History       countme.HistoryStore      `json:"history"`
 	OsVersionDist map[string]map[string]int `json:"os_version_dist,omitempty"`
+	DesktopDist   map[string]map[string]int `json:"desktop_dist,omitempty"`
 }
 
 func runFetchCountme() error {
@@ -628,7 +629,7 @@ func runFetchCountme() error {
 		fmt.Fprintf(os.Stderr, "→ countme cache is current (week %s already fetched), skipping CSV fetch\n", lastMonday)
 	} else {
 		fmt.Fprintln(os.Stderr, "→ Fetching countme CSV…")
-		csvRecs, osVersionDist, newLastModified, err := countme.FetchCSVLast30Days(store.CSVLastModified)
+		csvRecs, osVersionDist, formFactorDist, newLastModified, err := countme.FetchCSVLast30Days(store.CSVLastModified)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "⚠️  countme CSV: %v\n", err)
 		} else if csvRecs == nil {
@@ -639,6 +640,9 @@ func runFetchCountme() error {
 			store = countme.MergeIntoHistory(store, csvRecs)
 			if osVersionDist != nil {
 				store.OsVersionDist = countme.MergeOsVersionDist(store.OsVersionDist, osVersionDist)
+			}
+			if formFactorDist != nil {
+				store.DesktopDist = countme.MergeFormFactorDist(store.DesktopDist, formFactorDist)
 			}
 			store.CSVLastModified = newLastModified
 		}
@@ -721,6 +725,7 @@ func buildCountmeOutput(store *countme.HistoryStore) countmeOutput {
 		out.WoWGrowthPct = computeWoW(out.CurrentWeek, out.PrevWeek)
 	}
 	out.OsVersionDist = store.OsVersionDist
+	out.DesktopDist = store.DesktopDist
 	return out
 }
 
@@ -809,6 +814,7 @@ func loadFallbackCountmeHistory() *countme.HistoryStore {
 	return &countme.HistoryStore{
 		WeekRecords:   out.History.WeekRecords,
 		OsVersionDist: out.OsVersionDist,
+		DesktopDist:   out.DesktopDist,
 	}
 }
 

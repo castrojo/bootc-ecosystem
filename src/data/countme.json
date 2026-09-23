@@ -1046,5 +1046,11 @@
       "43": 88880,
       "44": 3
     }
+  },
+  "desktop_dist": {
+    "Bazzite": {
+      "desktop": 54000,
+      "handheld": 17000
+    }
   }
 }

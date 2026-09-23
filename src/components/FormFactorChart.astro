@@ -1,0 +1,79 @@
+---
+// FormFactorChart — a usage breakdown (NOT a "market share"/competition metric)
+// showing what fraction of an image's active devices run as a traditional
+// desktop/laptop vs. a handheld (Steam Deck, ROG Ally). Only images that ship
+// dedicated handheld variants are meaningful here — currently just Bazzite.
+import { BRAND_COLOURS } from '../lib/chart-theme.ts';
+
+interface Props {
+  desktopDist: Record<string, Record<string, number>>;
+}
+
+const { desktopDist } = Astro.props;
+
+const DESKTOP_COLOR = BRAND_COLOURS[0]; // blue
+const HANDHELD_COLOR = BRAND_COLOURS[4]; // red-orange
+
+const rows = Object.entries(desktopDist ?? {})
+  .map(([distro, factors]) => {
+    const desktop = factors.desktop ?? 0;
+    const handheld = factors.handheld ?? 0;
+    const total = desktop + handheld;
+    return { distro, desktop, handheld, total };
+  })
+  // Only show images with a meaningful handheld population — a 100%/0% split
+  // for desktop-only images (Bluefin, Aurora) would just be noise here.
+  .filter(row => row.total > 0 && row.handheld > 0)
+  .sort((a, b) => b.total - a.total);
+---
+
+{rows.length > 0 && (
+  <div class="chart-card">
+    <div class="chart-title">Desktop vs. Handheld Usage</div>
+    <p class="form-factor-note">
+      A usage breakdown of active devices by form factor — how many people run these images on a
+      traditional desktop/laptop vs. a handheld (Steam Deck, ROG Ally). Not a comparison between
+      images, just how each one is actually used.
+    </p>
+    <div class="form-factor-rows">
+      {rows.map(row => {
+        const desktopPct = row.total > 0 ? (row.desktop / row.total) * 100 : 0;
+        const handheldPct = row.total > 0 ? (row.handheld / row.total) * 100 : 0;
+        return (
+          <div class="form-factor-row">
+            <div class="form-factor-label">{row.distro}</div>
+            <div class="form-factor-bar" role="img" aria-label={`${row.distro}: ${desktopPct.toFixed(0)}% desktop, ${handheldPct.toFixed(0)}% handheld`}>
+              <div class="form-factor-segment" style={`width:${desktopPct}%; background:${DESKTOP_COLOR}`}></div>
+              <div class="form-factor-segment" style={`width:${handheldPct}%; background:${HANDHELD_COLOR}`}></div>
+            </div>
+            <div class="form-factor-legend">
+              <span class="legend-item"><span class="legend-dot" style={`background:${DESKTOP_COLOR}`}></span>Desktop {desktopPct.toFixed(0)}% ({row.desktop.toLocaleString()})</span>
+              <span class="legend-item"><span class="legend-dot" style={`background:${HANDHELD_COLOR}`}></span>Handheld {handheldPct.toFixed(0)}% ({row.handheld.toLocaleString()})</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
+
+<style>
+  .chart-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .form-factor-note { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0 0 18px; max-width: 720px; }
+  .form-factor-rows { display: flex; flex-direction: column; gap: 18px; }
+  .form-factor-row { display: flex; flex-direction: column; gap: 6px; }
+  .form-factor-label { font-size: 14px; font-weight: 600; color: var(--text); }
+  .form-factor-bar {
+    display: flex;
+    width: 100%;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: var(--border);
+  }
+  .form-factor-segment { height: 100%; transition: width 0.2s ease; }
+  .form-factor-legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+</style>
