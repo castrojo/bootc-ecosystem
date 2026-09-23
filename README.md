@@ -72,7 +72,8 @@ dist/                         → GitHub Pages
 ```
 bootc-ecosystem/
 ├── stats-go/                   Go CLI — fetches GitHub API data
-│   ├── cmd/stats/main.go       Entry point: collect → history → write stats.json
+│   ├── cmd/stats/main.go       Entry point: subcommand dispatch only
+│   ├── cmd/stats/fetch_*.go    One file per subcommand (homebrew, testhub, countme, releases, ...)
 │   ├── internal/github/        GitHub API client (traffic, files, releases, downloads)
 │   ├── internal/tap/           Ruby .rb parser, freshness check, download count
 │   └── internal/history/       Accumulates daily snapshots in .sync-cache/history.json
