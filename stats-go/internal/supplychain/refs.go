@@ -9,4 +9,5 @@ var SupplyChainCheckRefs = map[string]string{
 	"Zirconium":  "ghcr.io/zirconium-dev/zirconium:latest",
 	"bootcrew":   "ghcr.io/bootcrew/arch-bootc:latest",
 	"secureblue": "ghcr.io/secureblue/silverblue-main-hardened:latest",
+	"BlueBuild":  "ghcr.io/blue-build/cli:latest",
 }

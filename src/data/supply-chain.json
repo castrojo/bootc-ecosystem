@@ -1,14 +1,20 @@
 {
   "Aurora": {
-    "zstd_chunked": false,
-    "chunka_detected": false,
-    "legacy_rechunk": true,
+    "zstd_chunked": true,
+    "chunka_detected": true,
+    "legacy_rechunk": false,
     "slsa_provenance": true
   },
   "Bazzite": {
     "zstd_chunked": false,
     "chunka_detected": false,
-    "legacy_rechunk": true,
+    "legacy_rechunk": false,
+    "slsa_provenance": true
+  },
+  "BlueBuild": {
+    "zstd_chunked": false,
+    "chunka_detected": false,
+    "legacy_rechunk": false,
     "slsa_provenance": false
   },
   "Bluefin": {
@@ -18,20 +24,20 @@
     "slsa_provenance": true
   },
   "Zirconium": {
-    "zstd_chunked": false,
+    "zstd_chunked": true,
     "chunka_detected": false,
     "legacy_rechunk": false,
     "slsa_provenance": false
   },
   "bootcrew": {
     "zstd_chunked": false,
-    "chunka_detected": false,
+    "chunka_detected": true,
     "legacy_rechunk": false,
     "slsa_provenance": false
   },
   "secureblue": {
     "zstd_chunked": false,
-    "chunka_detected": false,
+    "chunka_detected": true,
     "legacy_rechunk": false,
     "slsa_provenance": false
   },
