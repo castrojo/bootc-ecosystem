@@ -48,6 +48,14 @@ const generatedAt = builds.generated_at ? new Date(builds.generated_at).toUTCStr
     </div>
   </header>
 
+  <section class="info-section">
+    <p class="notice">
+      <strong>Note:</strong> uCore reports <code>os_name=Fedora Linux</code> in Fedora countme data,
+      which is indistinguishable from the base Fedora OS. Countme-based active device tracking is
+      not available for uCore.
+    </p>
+  </section>
+
   {isBootstrap ? (
     <p class="collecting">Collecting build data — check back after the next CI run.</p>
   ) : (
@@ -133,6 +141,27 @@ const generatedAt = builds.generated_at ? new Date(builds.generated_at).toUTCStr
     color: var(--muted);
     font-size: 0.9rem;
     margin-bottom: 1.5rem;
+  }
+  code {
+    font-size: 0.85em;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+  }
+  .info-section {
+    margin-bottom: 1.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .info-section strong { color: var(--text); }
+  .notice {
+    padding: 0.75rem 1rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--yellow);
+    border-radius: 4px;
   }
 
   .monthly-section {
