@@ -1,39 +1,956 @@
 {
-  "generated_at": "",
-  "repos": [],
+  "generated_at": "2026-08-07T23:00:37Z",
+  "repos": [
+    {
+      "repo": "main",
+      "success_rate_7d": 73.07692307692307,
+      "success_rate_30d": 73.07692307692307,
+      "total_runs_7d": 52,
+      "total_runs_30d": 52,
+      "avg_duration_min": 8.656089743589744,
+      "streams": [
+        {
+          "name": "build-gts",
+          "success_rate_7d": 65.38461538461539,
+          "success_rate_30d": 65.38461538461539,
+          "total_runs_7d": 26,
+          "avg_duration_min": 7.453846153846154,
+          "last_run_at": "2026-08-07T06:00:22Z",
+          "last_conclusion": "failure"
+        },
+        {
+          "name": "build-latest",
+          "success_rate_7d": 80.76923076923077,
+          "success_rate_30d": 80.76923076923077,
+          "total_runs_7d": 26,
+          "avg_duration_min": 9.858333333333333,
+          "last_run_at": "2026-08-07T06:00:22Z",
+          "last_conclusion": "failure"
+        }
+      ],
+      "sign_step_success_rate_30d": 100,
+      "sbom_step_success_rate_30d": 0
+    },
+    {
+      "repo": "akmods",
+      "success_rate_7d": 77.21518987341773,
+      "success_rate_30d": 77.18120805369128,
+      "total_runs_7d": 79,
+      "total_runs_30d": 149,
+      "avg_duration_min": 18.9156050955414,
+      "streams": [
+        {
+          "name": "build-akmods-centos",
+          "success_rate_7d": 92.3076923076923,
+          "success_rate_30d": 96,
+          "total_runs_7d": 13,
+          "avg_duration_min": 17.96346153846154,
+          "last_run_at": "2026-08-07T01:33:04Z",
+          "last_conclusion": "success"
+        },
+        {
+          "name": "build-akmods-coreos-stable",
+          "success_rate_7d": 0,
+          "success_rate_30d": 0,
+          "total_runs_7d": 12,
+          "avg_duration_min": 20.796,
+          "last_run_at": "2026-08-07T01:30:24Z",
+          "last_conclusion": "failure"
+        },
+        {
+          "name": "build-akmods-coreos-testing",
+          "success_rate_7d": 91.66666666666666,
+          "success_rate_30d": 91.66666666666666,
+          "total_runs_7d": 12,
+          "avg_duration_min": 19.741333333333333,
+          "last_run_at": "2026-08-07T01:25:17Z",
+          "last_conclusion": "success"
+        },
+        {
+          "name": "build-akmods-longterm-6.18",
+          "success_rate_7d": 83.33333333333334,
+          "success_rate_30d": 91.66666666666666,
+          "total_runs_7d": 12,
+          "avg_duration_min": 20.877333333333336,
+          "last_run_at": "2026-08-07T01:32:24Z",
+          "last_conclusion": "success"
+        },
+        {
+          "name": "build-akmods-main",
+          "success_rate_7d": 91.66666666666666,
+          "success_rate_30d": 92,
+          "total_runs_7d": 12,
+          "avg_duration_min": 18.069871794871794,
+          "last_run_at": "2026-08-07T01:22:56Z",
+          "last_conclusion": "success"
+        },
+        {
+          "name": "build-akmods-ogc",
+          "success_rate_7d": 94.44444444444444,
+          "success_rate_30d": 88.88888888888889,
+          "total_runs_7d": 18,
+          "avg_duration_min": 16.58388888888889,
+          "last_run_at": "2026-08-07T01:26:58Z",
+          "last_conclusion": "success"
+        }
+      ],
+      "sign_step_success_rate_30d": 100,
+      "sbom_step_success_rate_30d": 100
+    }
+  ],
   "summary": {
-    "overall_success_rate_7d": 0,
-    "overall_success_rate_30d": 0,
-    "total_builds_7d": 0,
-    "total_builds_30d": 0,
-    "avg_duration_min": 0,
-    "p50_duration_min": 0,
-    "p95_duration_min": 0,
-    "p99_duration_min": 0,
-    "avg_queue_time_sec": 0,
-    "active_streams": 0,
-    "health_status": "unknown"
+    "overall_success_rate_7d": 75.57251908396947,
+    "overall_success_rate_30d": 76.11940298507463,
+    "total_builds_7d": 131,
+    "total_builds_30d": 201,
+    "avg_duration_min": 16.362998405103674,
+    "p50_duration_min": 16.583333333333332,
+    "p95_duration_min": 25.833333333333332,
+    "p99_duration_min": 56.9,
+    "avg_queue_time_sec": 1629.3,
+    "active_streams": 8,
+    "health_status": "degraded"
   },
   "dora_metrics": {
-    "deployment_frequency": "unknown",
-    "deploy_freq_per_week": 0,
-    "lead_time_minutes": 0,
-    "change_failure_rate_pct": 0,
-    "mttr_minutes": 0,
-    "mtbf_hours": 0,
-    "dora_level": "unknown"
+    "deployment_frequency": "multiple per day",
+    "deploy_freq_per_week": 17.551963048498845,
+    "lead_time_minutes": 19.9900871459695,
+    "change_failure_rate_pct": 21.21212121212121,
+    "mttr_minutes": 54.385833333333345,
+    "mtbf_hours": 7.258120567375885,
+    "dora_level": "elite"
   },
-  "top_flaky": [],
-  "recent_builds": [],
-  "duration_trend": [],
-  "failure_breakdown": [],
+  "top_flaky": [
+    {
+      "repo": "main",
+      "job_name": "build (base, main) / main",
+      "total_runs": 42,
+      "failures": 22,
+      "failure_rate": 52.38095238095239,
+      "flakiness_index": 0.3033058849310297,
+      "last_failure": "2026-08-07T05:06:41Z",
+      "top_fail_step": ""
+    },
+    {
+      "repo": "main",
+      "job_name": "build (base, nvidia) / main",
+      "total_runs": 42,
+      "failures": 22,
+      "failure_rate": 52.38095238095239,
+      "flakiness_index": 0.3033058849310297,
+      "last_failure": "2026-08-07T05:06:47Z",
+      "top_fail_step": ""
+    },
+    {
+      "repo": "main",
+      "job_name": "Verify Source Image Signatures",
+      "total_runs": 52,
+      "failures": 10,
+      "failure_rate": 19.230769230769234,
+      "flakiness_index": 0.21307112792575994,
+      "last_failure": "2026-08-07T06:00:24Z",
+      "top_fail_step": "Verify Source Images"
+    },
+    {
+      "repo": "main",
+      "job_name": "build (silverblue, main) / main",
+      "total_runs": 42,
+      "failures": 7,
+      "failure_rate": 16.666666666666664,
+      "flakiness_index": 0.18171238422770594,
+      "last_failure": "2026-08-06T01:41:04Z",
+      "top_fail_step": "Build Image"
+    },
+    {
+      "repo": "main",
+      "job_name": "build (silverblue, nvidia) / main",
+      "total_runs": 42,
+      "failures": 5,
+      "failure_rate": 11.904761904761903,
+      "flakiness_index": 0.181407241469622,
+      "last_failure": "2026-08-04T05:03:32Z",
+      "top_fail_step": ""
+    },
+    {
+      "repo": "main",
+      "job_name": "build (kinoite, nvidia) / main",
+      "total_runs": 42,
+      "failures": 5,
+      "failure_rate": 11.904761904761903,
+      "flakiness_index": 0.181407241469622,
+      "last_failure": "2026-08-04T05:03:26Z",
+      "top_fail_step": ""
+    },
+    {
+      "repo": "main",
+      "job_name": "build (kinoite, main) / main",
+      "total_runs": 42,
+      "failures": 7,
+      "failure_rate": 16.666666666666664,
+      "flakiness_index": 0.18079541091913331,
+      "last_failure": "2026-08-06T04:37:54Z",
+      "top_fail_step": "Build Image"
+    },
+    {
+      "repo": "main",
+      "job_name": "build (kinoite, main) / Check all kinoite:gts builds successful",
+      "total_runs": 21,
+      "failures": 2,
+      "failure_rate": 9.523809523809524,
+      "flakiness_index": 0.16885529522832146,
+      "last_failure": "2026-08-06T04:42:36Z",
+      "top_fail_step": "Check Jobs"
+    },
+    {
+      "repo": "akmods",
+      "job_name": "Check longterm-6.18 (44)",
+      "total_runs": 25,
+      "failures": 3,
+      "failure_rate": 12,
+      "flakiness_index": 0.16495721976846453,
+      "last_failure": "2026-08-04T14:34:26Z",
+      "top_fail_step": "Check for Build Failures"
+    },
+    {
+      "repo": "akmods",
+      "job_name": "Check centos (10)",
+      "total_runs": 26,
+      "failures": 2,
+      "failure_rate": 7.6923076923076925,
+      "flakiness_index": 0.15640591394622957,
+      "last_failure": "2026-08-02T03:22:42Z",
+      "top_fail_step": "Check for Build Failures"
+    }
+  ],
+  "recent_builds": [
+    {
+      "run_id": 31152456937,
+      "repo": "main",
+      "workflow": "ublue latest",
+      "branch": "renovate/sigstore-cosign-3.x",
+      "event": "pull_request",
+      "conclusion": "failure",
+      "duration_min": 0.21666666666666667,
+      "started_at": "2026-08-07T06:00:22Z",
+      "html_url": "",
+      "job_count": 2,
+      "failed_jobs": 1
+    },
+    {
+      "run_id": 31152456935,
+      "repo": "main",
+      "workflow": "ublue gts",
+      "branch": "renovate/sigstore-cosign-3.x",
+      "event": "pull_request",
+      "conclusion": "failure",
+      "duration_min": 0.25,
+      "started_at": "2026-08-07T06:00:22Z",
+      "html_url": "",
+      "job_count": 2,
+      "failed_jobs": 1
+    },
+    {
+      "run_id": 31149488347,
+      "repo": "main",
+      "workflow": "ublue latest",
+      "branch": "gh-readonly-queue/main/pr-2707-5b25878bf3f9e52aed2cefbc66e7cc31230f9f4d",
+      "event": "merge_group",
+      "conclusion": "success",
+      "duration_min": 12.716666666666667,
+      "started_at": "2026-08-07T05:06:08Z",
+      "html_url": "",
+      "job_count": 19,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31149488065,
+      "repo": "main",
+      "workflow": "ublue gts",
+      "branch": "gh-readonly-queue/main/pr-2707-5b25878bf3f9e52aed2cefbc66e7cc31230f9f4d",
+      "event": "merge_group",
+      "conclusion": "success",
+      "duration_min": 9.916666666666666,
+      "started_at": "2026-08-07T05:06:08Z",
+      "html_url": "",
+      "job_count": 19,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31147136282,
+      "repo": "main",
+      "workflow": "ublue gts",
+      "branch": "renovate/sigstore-cosign-3.x",
+      "event": "pull_request",
+      "conclusion": "failure",
+      "duration_min": 0.18333333333333332,
+      "started_at": "2026-08-07T04:21:01Z",
+      "html_url": "",
+      "job_count": 2,
+      "failed_jobs": 1
+    },
+    {
+      "run_id": 31147135845,
+      "repo": "main",
+      "workflow": "ublue latest",
+      "branch": "renovate/sigstore-cosign-3.x",
+      "event": "pull_request",
+      "conclusion": "failure",
+      "duration_min": 0.25,
+      "started_at": "2026-08-07T04:21:00Z",
+      "html_url": "",
+      "job_count": 2,
+      "failed_jobs": 1
+    },
+    {
+      "run_id": 31147131281,
+      "repo": "main",
+      "workflow": "ublue latest",
+      "branch": "renovate/images",
+      "event": "pull_request",
+      "conclusion": "success",
+      "duration_min": 8.5,
+      "started_at": "2026-08-07T04:20:55Z",
+      "html_url": "",
+      "job_count": 19,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31147131212,
+      "repo": "main",
+      "workflow": "ublue gts",
+      "branch": "renovate/images",
+      "event": "pull_request",
+      "conclusion": "success",
+      "duration_min": 6.983333333333333,
+      "started_at": "2026-08-07T04:20:55Z",
+      "html_url": "",
+      "job_count": 19,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31143549983,
+      "repo": "main",
+      "workflow": "ublue latest",
+      "branch": "release-please--branches--main",
+      "event": "pull_request",
+      "conclusion": "action_required",
+      "duration_min": 0,
+      "started_at": "2026-08-07T03:10:48Z",
+      "html_url": "",
+      "job_count": 0,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31143549995,
+      "repo": "main",
+      "workflow": "ublue gts",
+      "branch": "release-please--branches--main",
+      "event": "pull_request",
+      "conclusion": "action_required",
+      "duration_min": 0,
+      "started_at": "2026-08-07T03:10:48Z",
+      "html_url": "",
+      "job_count": 0,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31143041372,
+      "repo": "main",
+      "workflow": "ublue latest",
+      "branch": "gh-readonly-queue/main/pr-2706-7a5d3fa21d7890ec0d7626bc13a95ba754594989",
+      "event": "merge_group",
+      "conclusion": "success",
+      "duration_min": 12.383333333333333,
+      "started_at": "2026-08-07T03:01:22Z",
+      "html_url": "",
+      "job_count": 19,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31143041355,
+      "repo": "main",
+      "workflow": "ublue gts",
+      "branch": "gh-readonly-queue/main/pr-2706-7a5d3fa21d7890ec0d7626bc13a95ba754594989",
+      "event": "merge_group",
+      "conclusion": "success",
+      "duration_min": 10.833333333333334,
+      "started_at": "2026-08-07T03:01:22Z",
+      "html_url": "",
+      "job_count": 19,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31139412166,
+      "repo": "main",
+      "workflow": "ublue gts",
+      "branch": "renovate/images",
+      "event": "pull_request",
+      "conclusion": "success",
+      "duration_min": 7.85,
+      "started_at": "2026-08-07T01:52:18Z",
+      "html_url": "",
+      "job_count": 19,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31139412196,
+      "repo": "main",
+      "workflow": "ublue latest",
+      "branch": "renovate/images",
+      "event": "pull_request",
+      "conclusion": "success",
+      "duration_min": 7.916666666666667,
+      "started_at": "2026-08-07T01:52:18Z",
+      "html_url": "",
+      "job_count": 19,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31138378404,
+      "repo": "akmods",
+      "workflow": "Build CENTOS akmods",
+      "branch": "main",
+      "event": "schedule",
+      "conclusion": "success",
+      "duration_min": 26.45,
+      "started_at": "2026-08-07T01:33:04Z",
+      "html_url": "",
+      "job_count": 16,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31138343797,
+      "repo": "akmods",
+      "workflow": "Build LONGTERM-6.18 akmods",
+      "branch": "main",
+      "event": "schedule",
+      "conclusion": "success",
+      "duration_min": 25.85,
+      "started_at": "2026-08-07T01:32:24Z",
+      "html_url": "",
+      "job_count": 16,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31138233997,
+      "repo": "akmods",
+      "workflow": "Build COREOS-STABLE akmods",
+      "branch": "main",
+      "event": "schedule",
+      "conclusion": "failure",
+      "duration_min": 18.066666666666666,
+      "started_at": "2026-08-07T01:30:24Z",
+      "html_url": "",
+      "job_count": 40,
+      "failed_jobs": 6
+    },
+    {
+      "run_id": 31138048295,
+      "repo": "akmods",
+      "workflow": "Build OGC akmods",
+      "branch": "main",
+      "event": "schedule",
+      "conclusion": "success",
+      "duration_min": 19.266666666666666,
+      "started_at": "2026-08-07T01:26:58Z",
+      "html_url": "",
+      "job_count": 30,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31137957581,
+      "repo": "akmods",
+      "workflow": "Build COREOS-TESTING akmods",
+      "branch": "main",
+      "event": "schedule",
+      "conclusion": "success",
+      "duration_min": 24.45,
+      "started_at": "2026-08-07T01:25:17Z",
+      "html_url": "",
+      "job_count": 20,
+      "failed_jobs": 0
+    },
+    {
+      "run_id": 31137828622,
+      "repo": "akmods",
+      "workflow": "Build MAIN akmods",
+      "branch": "main",
+      "event": "schedule",
+      "conclusion": "success",
+      "duration_min": 25.283333333333335,
+      "started_at": "2026-08-07T01:22:56Z",
+      "html_url": "",
+      "job_count": 24,
+      "failed_jobs": 0
+    }
+  ],
+  "duration_trend": [
+    {
+      "date": "2026-07-24",
+      "p50": 18.916666666666668,
+      "p95": 20.033333333333335,
+      "p99": 20.033333333333335,
+      "avg": 18.903333333333336,
+      "min": 17.85,
+      "max": 20.033333333333335
+    },
+    {
+      "date": "2026-07-25",
+      "p50": 17.183333333333334,
+      "p95": 17.7,
+      "p99": 17.7,
+      "avg": 17.113333333333337,
+      "min": 16.45,
+      "max": 17.7
+    },
+    {
+      "date": "2026-07-26",
+      "p50": 18.016666666666666,
+      "p95": 22.033333333333335,
+      "p99": 22.033333333333335,
+      "avg": 18.630000000000003,
+      "min": 17.4,
+      "max": 22.033333333333335
+    },
+    {
+      "date": "2026-07-27",
+      "p50": 18,
+      "p95": 20.116666666666667,
+      "p99": 20.116666666666667,
+      "avg": 18.01666666666667,
+      "min": 15.966666666666667,
+      "max": 20.116666666666667
+    },
+    {
+      "date": "2026-07-28",
+      "p50": 15.616666666666667,
+      "p95": 23.45,
+      "p99": 23.45,
+      "avg": 16.973809523809525,
+      "min": 13.916666666666666,
+      "max": 23.45
+    },
+    {
+      "date": "2026-07-29",
+      "p50": 17.383333333333333,
+      "p95": 25.066666666666666,
+      "p99": 25.066666666666666,
+      "avg": 18.88095238095238,
+      "min": 15.95,
+      "max": 25.066666666666666
+    },
+    {
+      "date": "2026-07-30",
+      "p50": 19.483333333333334,
+      "p95": 24.483333333333334,
+      "p99": 24.483333333333334,
+      "avg": 19.483333333333334,
+      "min": 15.333333333333334,
+      "max": 24.483333333333334
+    },
+    {
+      "date": "2026-07-31",
+      "p50": 16.6,
+      "p95": 20.316666666666666,
+      "p99": 20.766666666666666,
+      "avg": 17.22,
+      "min": 13.216666666666667,
+      "max": 20.766666666666666
+    },
+    {
+      "date": "2026-08-01",
+      "p50": 18.55,
+      "p95": 78.96666666666667,
+      "p99": 78.96666666666667,
+      "avg": 32.63076923076923,
+      "min": 15.05,
+      "max": 78.96666666666667
+    },
+    {
+      "date": "2026-08-02",
+      "p50": 16.583333333333332,
+      "p95": 24,
+      "p99": 24,
+      "avg": 12.227380952380953,
+      "min": 3.066666666666667,
+      "max": 24
+    },
+    {
+      "date": "2026-08-03",
+      "p50": 16.166666666666668,
+      "p95": 20.383333333333333,
+      "p99": 20.383333333333333,
+      "avg": 15.581372549019607,
+      "min": 0.9333333333333333,
+      "max": 20.383333333333333
+    },
+    {
+      "date": "2026-08-04",
+      "p50": 14.733333333333333,
+      "p95": 19,
+      "p99": 26.65,
+      "avg": 12.270512820512822,
+      "min": 0.7333333333333333,
+      "max": 26.65
+    },
+    {
+      "date": "2026-08-05",
+      "p50": 12.166666666666666,
+      "p95": 21.55,
+      "p99": 21.55,
+      "avg": 13.161458333333336,
+      "min": 5.766666666666667,
+      "max": 21.55
+    },
+    {
+      "date": "2026-08-06",
+      "p50": 17.016666666666666,
+      "p95": 26.633333333333333,
+      "p99": 26.766666666666666,
+      "avg": 16.23020833333333,
+      "min": 0.16666666666666666,
+      "max": 26.766666666666666
+    },
+    {
+      "date": "2026-08-07",
+      "p50": 8.5,
+      "p95": 25.85,
+      "p99": 26.45,
+      "avg": 11.60083333333333,
+      "min": 0.18333333333333332,
+      "max": 26.45
+    }
+  ],
+  "failure_breakdown": [
+    {
+      "category": "test",
+      "count": 40,
+      "pct": 71.42857142857143
+    },
+    {
+      "category": "cancelled",
+      "count": 8,
+      "pct": 14.285714285714285
+    },
+    {
+      "category": "build",
+      "count": 4,
+      "pct": 7.142857142857142
+    },
+    {
+      "category": "push",
+      "count": 3,
+      "pct": 5.357142857142857
+    },
+    {
+      "category": "unknown",
+      "count": 1,
+      "pct": 1.7857142857142856
+    }
+  ],
   "trigger_breakdown": {
-    "scheduled": 0,
+    "scheduled": 86,
     "push": 0,
-    "pull_request": 0,
-    "workflow_dispatch": 0,
-    "other": 0
+    "pull_request": 98,
+    "workflow_dispatch": 13,
+    "other": 20
   },
-  "history": [],
-  "monthly_history": []
+  "history": [
+    {
+      "date": "2026-07-24",
+      "total_runs": 5,
+      "success_count": 4,
+      "failure_count": 1,
+      "cancelled_count": 0,
+      "avg_duration_min": 18.903333333333336,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 5,
+          "successes": 4,
+          "failures": 1
+        }
+      }
+    },
+    {
+      "date": "2026-07-25",
+      "total_runs": 5,
+      "success_count": 4,
+      "failure_count": 1,
+      "cancelled_count": 0,
+      "avg_duration_min": 17.113333333333337,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 5,
+          "successes": 4,
+          "failures": 1
+        }
+      }
+    },
+    {
+      "date": "2026-07-26",
+      "total_runs": 5,
+      "success_count": 4,
+      "failure_count": 1,
+      "cancelled_count": 0,
+      "avg_duration_min": 18.630000000000003,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 5,
+          "successes": 4,
+          "failures": 1
+        }
+      }
+    },
+    {
+      "date": "2026-07-27",
+      "total_runs": 5,
+      "success_count": 4,
+      "failure_count": 1,
+      "cancelled_count": 0,
+      "avg_duration_min": 18.01666666666667,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 5,
+          "successes": 4,
+          "failures": 1
+        }
+      }
+    },
+    {
+      "date": "2026-07-28",
+      "total_runs": 7,
+      "success_count": 6,
+      "failure_count": 1,
+      "cancelled_count": 0,
+      "avg_duration_min": 16.973809523809525,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 7,
+          "successes": 6,
+          "failures": 1
+        }
+      }
+    },
+    {
+      "date": "2026-07-29",
+      "total_runs": 7,
+      "success_count": 6,
+      "failure_count": 1,
+      "cancelled_count": 0,
+      "avg_duration_min": 18.88095238095238,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 7,
+          "successes": 6,
+          "failures": 1
+        }
+      }
+    },
+    {
+      "date": "2026-07-30",
+      "total_runs": 12,
+      "success_count": 10,
+      "failure_count": 2,
+      "cancelled_count": 0,
+      "avg_duration_min": 19.483333333333334,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 12,
+          "successes": 10,
+          "failures": 2
+        }
+      }
+    },
+    {
+      "date": "2026-07-31",
+      "total_runs": 25,
+      "success_count": 17,
+      "failure_count": 8,
+      "cancelled_count": 0,
+      "avg_duration_min": 17.22,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 1193.68,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 25,
+          "successes": 17,
+          "failures": 8
+        }
+      }
+    },
+    {
+      "date": "2026-08-01",
+      "total_runs": 13,
+      "success_count": 11,
+      "failure_count": 2,
+      "cancelled_count": 0,
+      "avg_duration_min": 32.63076923076923,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 31.076923076923077,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 13,
+          "successes": 11,
+          "failures": 2
+        }
+      }
+    },
+    {
+      "date": "2026-08-02",
+      "total_runs": 14,
+      "success_count": 2,
+      "failure_count": 6,
+      "cancelled_count": 6,
+      "avg_duration_min": 12.227380952380953,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 14,
+          "successes": 2,
+          "failures": 6
+        }
+      }
+    },
+    {
+      "date": "2026-08-03",
+      "total_runs": 17,
+      "success_count": 14,
+      "failure_count": 3,
+      "cancelled_count": 0,
+      "avg_duration_min": 15.581372549019607,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 67.70588235294117,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 13,
+          "successes": 11,
+          "failures": 2
+        },
+        "main": {
+          "runs": 4,
+          "successes": 3,
+          "failures": 1
+        }
+      }
+    },
+    {
+      "date": "2026-08-04",
+      "total_runs": 28,
+      "success_count": 22,
+      "failure_count": 3,
+      "cancelled_count": 3,
+      "avg_duration_min": 11.39404761904762,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 14,
+          "successes": 10,
+          "failures": 3
+        },
+        "main": {
+          "runs": 14,
+          "successes": 12,
+          "failures": 0
+        }
+      }
+    },
+    {
+      "date": "2026-08-05",
+      "total_runs": 18,
+      "success_count": 14,
+      "failure_count": 1,
+      "cancelled_count": 3,
+      "avg_duration_min": 11.699074074074076,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 66.05555555555556,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 8,
+          "successes": 6,
+          "failures": 1
+        },
+        "main": {
+          "runs": 10,
+          "successes": 8,
+          "failures": 0
+        }
+      }
+    },
+    {
+      "date": "2026-08-06",
+      "total_runs": 34,
+      "success_count": 20,
+      "failure_count": 12,
+      "cancelled_count": 2,
+      "avg_duration_min": 15.275490196078428,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 18,
+          "successes": 15,
+          "failures": 3
+        },
+        "main": {
+          "runs": 16,
+          "successes": 5,
+          "failures": 9
+        }
+      }
+    },
+    {
+      "date": "2026-08-07",
+      "total_runs": 22,
+      "success_count": 15,
+      "failure_count": 5,
+      "cancelled_count": 2,
+      "avg_duration_min": 10.54621212121212,
+      "p95_duration_min": 0,
+      "avg_queue_time_sec": 0,
+      "repo_breakdown": {
+        "akmods": {
+          "runs": 6,
+          "successes": 5,
+          "failures": 1
+        },
+        "main": {
+          "runs": 16,
+          "successes": 10,
+          "failures": 4
+        }
+      }
+    }
+  ],
+  "monthly_history": [
+    {
+      "month": "2026-07",
+      "total_runs": 71,
+      "success_count": 55,
+      "failure_count": 16,
+      "cancelled_count": 0,
+      "success_rate": 77.46478873239437,
+      "avg_duration_min": 18.00845070422536,
+      "p95_duration_min": 22.833333333333332,
+      "repo_success_rate": {
+        "akmods": 77.46478873239437
+      },
+      "dora_level": "low"
+    }
+  ]
 }
