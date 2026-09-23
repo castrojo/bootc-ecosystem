@@ -271,6 +271,59 @@ describe("src/data/testhub.json schema", () => {
   });
 });
 
+// ── platform-maturity.json ────────────────────────────────────────────────────
+
+describe("src/data/platform-maturity.json schema", () => {
+  const raw = loadJSON("src/data/platform-maturity.json") as Record<string, unknown>;
+
+  it("has required top-level fields", () => {
+    expect(raw).toHaveProperty("generated_at");
+    expect(raw).toHaveProperty("model_url");
+    expect(raw).toHaveProperty("dimensions");
+  });
+
+  it("generated_at is a non-empty string", () => {
+    expect(typeof raw.generated_at).toBe("string");
+    expect((raw.generated_at as string).length).toBeGreaterThan(0);
+  });
+
+  it("dimensions is a non-empty array", () => {
+    expect(Array.isArray(raw.dimensions)).toBe(true);
+    expect((raw.dimensions as unknown[]).length).toBeGreaterThan(0);
+  });
+
+  it("every dimension has id, name, level (1-5), evidence, last_assessed", () => {
+    const dimensions = raw.dimensions as Record<string, unknown>[];
+    for (const d of dimensions) {
+      expect(typeof d.id).toBe("string");
+      expect((d.id as string).length).toBeGreaterThan(0);
+      expect(typeof d.name).toBe("string");
+      expect((d.name as string).length).toBeGreaterThan(0);
+      expect(typeof d.level).toBe("number");
+      expect(d.level as number).toBeGreaterThanOrEqual(1);
+      expect(d.level as number).toBeLessThanOrEqual(5);
+      expect(typeof d.evidence).toBe("string");
+      expect((d.evidence as string).length).toBeGreaterThan(0);
+      expect(typeof d.last_assessed).toBe("string");
+      expect(d.last_assessed as string).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+  });
+
+  it("dimension ids are unique", () => {
+    const dimensions = raw.dimensions as Record<string, unknown>[];
+    const ids = dimensions.map((d) => d.id as string);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("covers the seven CNCF Platform Engineering Maturity Model dimensions", () => {
+    const dimensions = raw.dimensions as Record<string, unknown>[];
+    const ids = new Set(dimensions.map((d) => d.id as string));
+    for (const expected of ["provisioning", "configuration", "observability", "onboarding", "workflows", "security", "cost"]) {
+      expect(ids.has(expected), `missing dimension: ${expected}`).toBe(true);
+    }
+  });
+});
+
 // ── contributors.json ─────────────────────────────────────────────────────────
 
 describe("src/data/contributors.json schema", () => {

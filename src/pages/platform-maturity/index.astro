@@ -1,0 +1,56 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PlatformMaturityChart from '../../components/PlatformMaturityChart.astro';
+import PlatformMaturityTable from '../../components/PlatformMaturityTable.astro';
+import data from '../../data/platform-maturity.json';
+
+const generatedAt = new Date(data.generated_at).toUTCString();
+const dimensions = (data.dimensions ?? []) as {
+  id: string;
+  name: string;
+  level: number;
+  evidence: string;
+  last_assessed: string;
+}[];
+const lastAssessedDates = dimensions.map((d) => d.last_assessed).sort();
+const mostRecentAssessment = lastAssessedDates.length > 0 ? lastAssessedDates[lastAssessedDates.length - 1] : null;
+---
+
+<Layout title="Platform Maturity — bootc-ecosystem" activeTab="platform-maturity">
+  <header class="page-header">
+    <h1>Platform Engineering Maturity Self-Assessment</h1>
+    <div class="meta">
+      Updated {generatedAt} ·
+      <a href={data.model_url} target="_blank" rel="noopener noreferrer">CNCF Platform Engineering Maturity Model ↗</a>
+      {mostRecentAssessment && <> · Last dimension re-assessed {mostRecentAssessment}</>}
+    </div>
+    <p class="intro">
+      A qualitative self-assessment of the Bluefin project's platform engineering maturity, scored per dimension
+      from the <a href="https://tag-app-delivery.cncf.io/whitepapers/platform-eng-maturity-model/" target="_blank" rel="noopener noreferrer">CNCF Platform Engineering Maturity Model</a>.
+      Unlike the rest of this dashboard, this data is hand-maintained — it cannot be derived from API telemetry — and is
+      meant to track how the project's platform maturity evolves across sessions, not to be a real-time metric.
+    </p>
+  </header>
+
+  <PlatformMaturityChart dimensions={dimensions} />
+
+  <section class="section">
+    <h2>Dimension Scores</h2>
+    <PlatformMaturityTable dimensions={dimensions} />
+  </section>
+</Layout>
+
+<style>
+  .page-header { margin-bottom: 24px; }
+  .intro {
+    margin-top: 10px;
+    color: var(--muted);
+    max-width: 72ch;
+    line-height: 1.5;
+  }
+  .section { margin-bottom: 20px; }
+  .section > h2 {
+    margin: 22px 0 12px;
+    color: var(--text);
+  }
+</style>

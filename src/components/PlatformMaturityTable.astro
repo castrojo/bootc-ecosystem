@@ -1,0 +1,95 @@
+---
+interface Dimension {
+  id: string;
+  name: string;
+  level: number;
+  evidence: string;
+  last_assessed: string;
+}
+
+interface Props {
+  dimensions: Dimension[];
+}
+const { dimensions } = Astro.props;
+
+const LEVEL_LABELS: Record<number, string> = {
+  1: 'Initial',
+  2: 'Emerging',
+  3: 'Progressing',
+  4: 'Optimizing',
+  5: 'Leading',
+};
+
+function levelBadge(level: number): string {
+  return LEVEL_LABELS[level] ?? 'Unknown';
+}
+
+function levelClass(level: number): string {
+  if (level >= 4) return 'high';
+  if (level === 3) return 'mid';
+  return 'low';
+}
+---
+
+<div class="table-wrap">
+  <table id="platform-maturity-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Level</th>
+        <th>Evidence</th>
+        <th>Last Assessed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {dimensions.map((d) => (
+        <tr>
+          <td>{d.name}</td>
+          <td>
+            <span class:list={['level-badge', levelClass(d.level)]}>
+              {d.level} · {levelBadge(d.level)}
+            </span>
+          </td>
+          <td class="evidence-cell">{d.evidence}</td>
+          <td class="date-cell">{d.last_assessed}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  td { color: var(--text); }
+  tr:hover td { background: var(--bg2); }
+  .evidence-cell { max-width: 48ch; color: var(--muted); line-height: 1.5; }
+  .date-cell { white-space: nowrap; color: var(--muted); }
+  .level-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .level-badge.high {
+    border-color: #24a148;
+    color: #42be65;
+    background: rgba(36, 161, 72, 0.12);
+  }
+  .level-badge.mid {
+    border-color: #f1c21b;
+    color: #b45309;
+    background: rgba(241, 194, 27, 0.12);
+  }
+  .level-badge.low {
+    border-color: #da1e28;
+    color: #fa4d56;
+    background: rgba(250, 77, 86, 0.12);
+  }
+</style>

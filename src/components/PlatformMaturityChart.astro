@@ -1,0 +1,111 @@
+---
+import ChartCard from './ChartCard.astro';
+import { safeJson } from '../lib/inject.ts';
+
+interface Dimension {
+  id: string;
+  name: string;
+  level: number;
+}
+
+interface Props {
+  dimensions: Dimension[];
+}
+const { dimensions } = Astro.props;
+
+const series = dimensions.map((d) => ({ name: d.name, level: d.level }));
+---
+
+{series.length === 0 ? (
+  <ChartCard title="Platform Maturity by Dimension" canvasId="platform-maturity-chart" isEmpty emptyMsg="No self-assessment data yet." />
+) : (
+  <>
+    <ChartCard
+      title="Platform Maturity by Dimension"
+      canvasId="platform-maturity-chart"
+      height={380}
+    />
+    <script type="application/json" id="platform-maturity-chart-data" set:html={safeJson({ series })}></script>
+  </>
+)}
+
+<script>
+import '../lib/chart-registry.js';
+import { getChartColors } from '../lib/chart-theme.js';
+import { readChartData } from '../lib/inject.js';
+import { Chart } from 'chart.js';
+
+const dataEl = document.getElementById('platform-maturity-chart-data');
+if (dataEl) {
+  const { series } = readChartData<{
+    series: { name: string; level: number }[]
+  }>('platform-maturity-chart-data');
+  const canvas = document.getElementById('platform-maturity-chart') as HTMLCanvasElement;
+  const c = getChartColors();
+
+  let chart: Chart | undefined;
+  try {
+    chart = new Chart(canvas, {
+      type: 'radar',
+      data: {
+        labels: series.map((s) => s.name),
+        datasets: [
+          {
+            label: 'Current Level',
+            data: series.map((s) => s.level),
+            backgroundColor: 'rgba(175, 104, 217, 0.2)',
+            borderColor: '#af68d9',
+            borderWidth: 2,
+            pointBackgroundColor: '#af68d9',
+            pointRadius: 3,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            min: 0,
+            max: 5,
+            ticks: {
+              stepSize: 1,
+              color: c.muted,
+              backdropColor: 'transparent',
+            },
+            grid: { color: c.grid },
+            angleLines: { color: c.grid },
+            pointLabels: { color: c.text, font: { size: 12 } },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (item: { parsed: { r: number }; label?: string }) => `Level ${item.parsed.r} / 5`,
+            },
+          },
+        },
+      },
+    });
+  } catch (e) {
+    console.error('[PlatformMaturityChart] Chart.js init failed:', e);
+  }
+
+  window.addEventListener('themechange', () => {
+    if (!chart) return;
+    const colors = getChartColors();
+    const scale = chart.options.scales!.r as {
+      ticks: { color: string };
+      grid: { color: string };
+      angleLines: { color: string };
+      pointLabels: { color: string };
+    };
+    scale.ticks.color = colors.muted;
+    scale.grid.color = colors.grid;
+    scale.angleLines.color = colors.grid;
+    scale.pointLabels.color = colors.text;
+    chart.update('none');
+  });
+}
+</script>
