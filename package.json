@@ -2,6 +2,7 @@
   "name": "bootc-ecosystem",
   "type": "module",
   "version": "0.1.0",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "astro dev --port 4324 --host",
     "build": "astro build",
