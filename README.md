@@ -87,10 +87,16 @@ bootc-ecosystem/
 │
 ├── .sync-cache/history.json    Persisted history (via GitHub Actions cache)
 ├── Containerfile               3-stage Chainguard build (Go → Astro → nginx)
+├── go.work                     Go workspace declaring stats-go/ as its own module
 └── .github/workflows/
     ├── daily-build.yml         Sync + Astro build + GitHub Pages deploy (6 AM UTC)
-    └── build-container.yml     Sync + container build + push to GHCR (8 AM UTC)
+    ├── build-container.yml     Sync + container build + push to GHCR (8 AM UTC)
+    └── stats-go-test.yml       go vet + go test for stats-go/ on every PR
 ```
+
+`stats-go/` is a self-contained Go module (its own `go.mod`/`go.sum`) declared in the
+root `go.work` file. Run `go build ./stats-go/...` or `go test ./stats-go/...` from the
+repo root, or `cd stats-go && go test ./...` directly.
 
 ## GitHub Actions
 
